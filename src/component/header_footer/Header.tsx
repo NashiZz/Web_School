@@ -105,7 +105,7 @@ function Header() {
               </div>
             )}
           </div>
-          <a href="#" className="block text-gray-700 hover:text-white py-2">กิจกรรม/ผลงาน</a>
+          <Link to="/show_activity"  className="block text-gray-700 hover:text-white py-2">กิจกรรม/ผลงาน</Link>
           <a href="#" className="block text-gray-700 hover:text-white py-2">ติดต่อ</a>
         </nav>
 

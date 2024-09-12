@@ -1,8 +1,7 @@
 import { useState } from "react";
-// import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const AddData_Page = () => {
+const AddPersonalPage = () => {
     // const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     const [image, setImage] = useState<string | null>(null);
@@ -120,4 +119,4 @@ const AddData_Page = () => {
     );
 };
 
-export default AddData_Page;
+export default AddPersonalPage;

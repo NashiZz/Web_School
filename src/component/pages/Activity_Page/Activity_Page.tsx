@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import { styled } from '@mui/material/styles';
@@ -10,8 +10,8 @@ const ActivityPage = () => {
     src: 'src/assets/banner1.jpg',
   }));
 
-  const itemsPerPage = 6; 
-  const totalPages = Math.ceil(items.length / itemsPerPage); 
+  const itemsPerPage = 6;
+  const totalPages = Math.ceil(items.length / itemsPerPage);
 
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -20,9 +20,9 @@ const ActivityPage = () => {
 
   const StyledPagination = styled(Pagination)({
     "& .MuiPaginationItem-page.Mui-selected": {
-        backgroundColor: "#d9f99d", // lime-200
-        color: "#000", 
-      },
+      backgroundColor: "#d9f99d", // lime-200
+      color: "#000",
+    },
   });
 
   return (
@@ -44,7 +44,7 @@ const ActivityPage = () => {
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-2">การปรับแก้ไขคะแนนความประพฤติ</h3>
               <p className="text-sm text-gray-600 mb-4">วันที่ 1 สิงหาคม 2566...</p>
-              <Link to="/news/1" className="text-red-600 hover:underline">Read more</Link>
+              <Link to={`/activity/${item.id}`} className="text-red-600 hover:underline">Read more</Link>
             </div>
           </div>
         ))}

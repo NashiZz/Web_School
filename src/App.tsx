@@ -6,6 +6,7 @@ import TeacherPage from "./component/pages/Teacher_Page/Teacher_Page";
 import ActivityPage from "./component/pages/Activity_Page/Activity_Page";
 import DetailAct_Page from "./component/pages/Activity_Page/Detail_Act_Page";
 import AddData_Page from "./component/pages/Add_Data/addData_page";
+import AddPersonalPage from "./component/pages/Add_Data/add_personal";
 
 const routers = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ const routers = createBrowserRouter([
       { path: "/show_activity", element: <ActivityPage/> },
       { path: "/activity/:id", element: <DetailAct_Page /> },
       { path: "/add_data", element: <AddData_Page/> },
+      { path: "/addpersonal", element: <AddPersonalPage/> },
     ],
   }
 ]);

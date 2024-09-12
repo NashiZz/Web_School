@@ -3,7 +3,7 @@ import Logo from "../../../assets/logo.png";
 import Por from "../../../assets/po.jpg";
 import { db } from "../../../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
-import { useEffect, useRef, } from "react";
+import { useEffect, useRef } from "react";
 import { InformationSchoolModel } from "../../../model/information_school";
 
 const SchoolHistory = () => {
@@ -12,14 +12,15 @@ const SchoolHistory = () => {
   useEffect(() => {
     // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
     const loadData = onSnapshot(inforRef, (snapshot) => {
-      if (!snapshot.empty) { // ตรวจสอบว่ามีข้อมูลใน snapshot หรือไม่
+      if (!snapshot.empty) {
+        // ตรวจสอบว่ามีข้อมูลใน snapshot หรือไม่
         const docData = {
           id: snapshot.docs[0].id, // กรณีข้อมูลเดียว เลือกเอกสารแรก
           ...snapshot.docs[0].data(),
-        }  as InformationSchoolModel
+        } as InformationSchoolModel;
         infor.current = docData; // อัปเดตข้อมูลใน state
       }
-
+      console.log(infor.current?.address);
     });
     return () => loadData();
   }, [inforRef]);
@@ -47,33 +48,26 @@ const SchoolHistory = () => {
                   ข้อมูลพื้นฐาน
                 </h2>
                 <p className="text-justify">{infor.current?.general_info}</p>
-                <h2 className="text-lg font-bold 24-3">
-                  บริบทสำคัญ
-                </h2>
-                <p className="text-justify">{infor.current?.important_context}</p>
+                <h2 className="text-lg font-bold 24-3">บริบทสำคัญ</h2>
+                <p className="text-justify">
+                  {infor.current?.important_context}
+                </p>
                 <h2 className="text-md font-bold mb-4 ">
                   1. วิสัยทัศน์โรงเรียน Vision
                 </h2>
                 <p className="text-justify">{infor.current?.vision}</p>
                 <h2 className="text-md font-bold ">2. พันธกิจ Mission</h2>
-                <p className="text-justify">
-                  2.1 {infor.current?.mission_1}</p>
-                  <p className="text-justify">
-                  2.2 {infor.current?.mission_2}</p>
-                  <p className="text-justify">
-                  2.3 {infor.current?.mission_3}</p>
-                  <p className="text-justify">
-                  2.4 {infor.current?.mission_4}</p>
-                  <p className="text-justify">
-                  2.5 {infor.current?.mission_5}</p>
-                  <h2 className="text-md font-bold ">3. จุดมุ่งหมายเพื่อพัฒนาการศึกษา</h2>
-                <p className="text-justify">
-                  3.1 {infor.current?.goal_1}</p>
-                  <p className="text-justify">
-                  3.2 {infor.current?.goal_2}</p>
-                  <p className="text-justify">
-                  3.3 {infor.current?.goal_3}</p>
-               
+                <p className="text-justify">2.1 {infor.current?.mission_1}</p>
+                <p className="text-justify">2.2 {infor.current?.mission_2}</p>
+                <p className="text-justify">2.3 {infor.current?.mission_3}</p>
+                <p className="text-justify">2.4 {infor.current?.mission_4}</p>
+                <p className="text-justify">2.5 {infor.current?.mission_5}</p>
+                <h2 className="text-md font-bold ">
+                  3. จุดมุ่งหมายเพื่อพัฒนาการศึกษา
+                </h2>
+                <p className="text-justify">3.1 {infor.current?.goal_1}</p>
+                <p className="text-justify">3.2 {infor.current?.goal_2}</p>
+                <p className="text-justify">3.3 {infor.current?.goal_3}</p>
               </div>
             </div>
             <div className="w-full md:w-1/3 px-4">

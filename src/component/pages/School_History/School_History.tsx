@@ -3,27 +3,44 @@ import Logo from "../../../assets/logo.png";
 import Por from "../../../assets/po.jpg";
 import { db } from "../../../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
-import { useEffect, useRef, } from "react";
+import { useEffect, useRef, useState, } from "react";
 import { InformationSchoolModel } from "../../../model/information_school";
+import { CircularProgress } from "@mui/material";
 
 const SchoolHistory = () => {
   const inforRef = collection(db, "information_school");
   const infor = useRef<InformationSchoolModel>(); // กำหนด type ของ state
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
+    
     const loadData = onSnapshot(inforRef, (snapshot) => {
-      if (!snapshot.empty) { // ตรวจสอบว่ามีข้อมูลใน snapshot หรือไม่
+      try {
+    if (!snapshot.empty) { // ตรวจสอบว่ามีข้อมูลใน snapshot หรือไม่
         const docData = {
           id: snapshot.docs[0].id, // กรณีข้อมูลเดียว เลือกเอกสารแรก
           ...snapshot.docs[0].data(),
         }  as InformationSchoolModel
         infor.current = docData; // อัปเดตข้อมูลใน state
       }
+    } catch (error) {
+      console.error("Error fetching event data:", error);
+    }finally{
+      setLoading(false);
+    }
+      
 
     });
     return () => loadData();
   }, [inforRef]);
   return (
+    <>
+    {loading ? (
+        <div className="h-screen w-full flex justify-center items-center">
+          <CircularProgress />
+        </div>
+      ) : (
     <div>
       <div
         className="relative w-full h-[500px] bg-cover bg-center"
@@ -123,7 +140,8 @@ const SchoolHistory = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div>)}
+    </>
   );
 };
 

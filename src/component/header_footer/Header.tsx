@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Logo from "../../assets/logo.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import Flag from 'react-world-flags';
 
 type DropdownMenu = 'about' | 'humen' | ''; // Define the possible values for dropdownOpen
 
@@ -23,7 +22,7 @@ function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      if (window.scrollY > 50.0) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -106,16 +105,10 @@ function Header() {
             )}
           </div>
           <Link to="/show_activity"  className="block text-gray-700 hover:text-white py-2">กิจกรรม/ผลงาน</Link>
-          <Link to="/add_data"  className="block text-gray-700 hover:text-white py-2">ติดต่อ</Link>
+          <Link to=""  className="block text-gray-700 hover:text-white py-2">ติดต่อ</Link>
         </nav>
 
         <div className="flex items-center space-x-4 w-full md:w-auto">
-          <button className="text-gray-700 hover:text-white">
-            <Flag code="TH" className="h-5 w-7" />
-          </button>
-          <button className="text-gray-700 hover:text-white">
-            <Flag code="US" className="h-5 w-7" /> {/* Adjust flag code as needed */}
-          </button>
 
           {showSearch && (
             <input

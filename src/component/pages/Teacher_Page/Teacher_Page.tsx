@@ -21,8 +21,6 @@ const TeacherPage = () => {
       })) as PersonnelModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
       personnel.current = newData; // อัปเดตข้อมูลใน state
     });
-
-    // ทำการ unsubscribe เมื่อ component ถูก unmount
     loadData();
   }, [personnelRef]);
 

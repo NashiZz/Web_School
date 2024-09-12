@@ -1,12 +1,30 @@
+import { db } from "../../../firebase";
+import {
+  collection,
+  onSnapshot,
+
+} from "firebase/firestore";
 import backgroundImage from "../../../assets/school_history.jpg";
+import { useEffect, useState } from "react";
+import { PersonnelModel } from "../../../model/persoonal";
 
 const TeacherPage = () => {
-    const items = Array.from({ length: 22 }, (_, index) => ({
-        id: index,
-        src: 'src/assets/ผอ.จิตรกร.jpg',
-        title: 'ผอ จิตรกร',
-        subtitle: 'ผู้บริหารโรงเรียน'
-      }));
+  const personnelRef = collection(db, "personnel");
+  const [data, setData] = useState<PersonnelModel[]>([]); // กำหนด type ของ state
+
+  useEffect(() => {
+    // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
+    const loadData = onSnapshot(personnelRef, (snapshot) => {
+      const newData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as PersonnelModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
+      setData(newData); // อัปเดตข้อมูลใน state
+    });
+
+    // ทำการ unsubscribe เมื่อ component ถูก unmount
+    return () => loadData();
+  }, [personnelRef]);
   return (
     <div>
        <div
@@ -21,18 +39,17 @@ const TeacherPage = () => {
       </div>
     </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:px-40 xl:pr-40  lg:px-30 lg:pr-30 md:px-20 md:pr-20 sm:px-20 sm:pr-20  px-10 pr-10 pt-10 pb-10">
-      {items.map((item) => (
-        <div key={item.id} className="bg-white rounded-lg shadow-lg relative overflow-hidden">
+      {data.map((item) => (
+        <div  className="bg-white rounded-lg shadow-lg relative overflow-hidden">
           <img
-            src={item.src}
-            alt={`News Image ${item.id}`}
+            src={"src/assets/ผอ.จิตรกร.jpg"}
             className="w-full h-96 object-cover"
           />
           <div className="flex p-4 flex-col justify-center items-center">
-            <h4 className="text-sm mb-4">{item.title}</h4>
-            <h3 className="text-lg text-gray-600 font-semibold mb-2">
-              {item.subtitle}
-            </h3>
+          <h4 className="text-lg font-semibold mb-4">{`${item.prefix} ${item.firstname} ${item.lastname} ${item.sid}`}</h4>
+            <h4 className="text-md text-gray-600  mb-2">
+              {item.role}
+            </h4>
           </div>
         </div>
       ))}

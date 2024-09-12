@@ -1,60 +1,50 @@
+import QRCode from "../../assets/QRCode.png";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+
 function Footer() {
     return (
-        <footer className="bg-white shadow-md py-8 mt-8">
-            <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-
+        <footer className="bg-white shadow-md py-12">
+            <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-16 text-center md:text-left">
                 <div>
-                    <h3 className="text-pink-600 font-bold text-lg mb-4">เมนูด่วน</h3>
-                    <ul className="text-gray-700 space-y-2">
-                        <li><a href="#">ข่าวประชาสัมพันธ์</a></li>
-                        <li><a href="#">ภาพกิจกรรม</a></li>
-                        <li><a href="#">ข่าววิชาการ</a></li>
-                        <li><a href="#">จัดซื้อจัดจ้าง/รับสมัครงาน</a></li>
-                        <li><a href="#">หลักสูตร</a></li>
-                        <li><a href="#">ตารางเรียน</a></li>
-                        <li><a href="#">เอกสารรับรองประกอบการเบิกจ่ายค่าบำรุงการศึกษา</a></li>
-                        <li><a href="#">ดูผลการเรียน</a></li>
-                        <li><a href="#">ศูนย์ สอวน.วิชาดาราศาสตร์</a></li>
-                        <li><a href="#">ศูนย์ สอวน.วิชาคอมพิวเตอร์</a></li>
-                        <li><a href="#">ศูนย์ STEM</a></li>
-                        <li><a href="#">ศูนย์ พสวท.</a></li>
-                        <li><a href="#">ติดต่อโรงเรียน</a></li>
-                    </ul>
+                    <h3 className="text-pink-600 font-bold text-xl mb-6">Page Facebook</h3>
+                    <div className="flex justify-center md:justify-start">
+                        <img src={QRCode} alt="QRCode" className="h-40 w-40 object-contain transform transition duration-300 hover:scale-105" />
+
+                    </div>
+                    <div className="justify-center space-x-4 mt-6">
+                        <a href="https://web.facebook.com/kkhw2557/" target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 space-x-2 transform transition duration-300 hover:scale-110">
+                            <FontAwesomeIcon icon={faFacebook} size="2x" />
+                            <p className="text-lg">Facebook</p>
+                        </a>
+                    </div>
                 </div>
-
                 <div>
-                    <h3 className="text-pink-600 font-bold text-lg mb-4">ติดต่อ</h3>
+                    <h3 className="text-pink-600 font-bold text-xl mb-6">แผนที่</h3>
                     <div className="flex justify-center">
                         <iframe
-                            src="https://www.google.com/maps/embed?..."
-                            width="300"
-                            height="200"
+                            src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.706866473871!2d${103.33897523289427}!3d${16.453283702893057}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3121e6b81b081fd7%3A0xc0c819f8c365eab4!2s${16.453283702893057}%2C%20${103.33897523289427}!5e0!3m2!1sen!2sth!4v1694524943201!5m2!1sen!2sth&language=th`}
+                            width="100%"
+                            height="250"
                             style={{ border: 0 }}
                             allowFullScreen={true}
                             loading="lazy"
+                            className="rounded-lg shadow-lg"
                         ></iframe>
-                    </div>
-                    <div className="flex justify-center space-x-4 mt-4">
-                        <a href="#"><img src="path-to-facebook-icon.png" alt="Facebook" className="h-6" /></a>
-                        <a href="#"><img src="path-to-twitter-icon.png" alt="Twitter" className="h-6" /></a>
-                        <a href="#"><img src="path-to-instagram-icon.png" alt="Instagram" className="h-6" /></a>
-                        <a href="#"><img src="path-to-youtube-icon.png" alt="YouTube" className="h-6" /></a>
                     </div>
                 </div>
 
                 <div>
-                    <h3 className="text-pink-600 font-bold text-lg mb-4">ติดต่อ</h3>
-                    <p className="text-gray-700">
-                        ที่อยู่โรงเรียน: 132/11 ถนนพระราม 6 แขวงพญาไท เขตพญาไท กรุงเทพฯ 10400<br />
-                        สำนักงานผู้อำนวยการ: director@samsenwit.ac.th<br />
-                        กลุ่มบริหารวิชาการ: academic@samsenwit.ac.th<br />
-                        กลุ่มบริหารกิจการนักเรียน: student@samsenwit.ac.th<br />
-                        กลุ่มบริหารทั่วไป: general@samsenwit.ac.th<br />
-                        กลุ่มบริหารบุคลากรเงินและสินทรัพย์: financial@samsenwit.ac.th<br />
-                        โทรศัพท์: 0-2279-1992, 0-2279-2429<br />
-                        โทรสาร: 0-2278-2997, 0-2618-3068, 0-2279-2638<br />
-                        งานเว็บไซต์โรงเรียน (Admin): webmaster@samsenwit.ac.th<br />
-                        งานประชาสัมพันธ์: pr@samsenwit.ac.th
+                    <h3 className="text-pink-600 font-bold text-xl mb-6">ติดต่อ</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                        ที่อยู่โรงเรียน: โรงเรียนคลองขามวิทยาคาร
+                        <br />
+                        136  หมู่ 4 ตำบลคลองขาม อำเภอยางตลาด จังหวัดกาฬสินธุ์ 46120
+                        <br />
+                        <br />
+                        โทร: 043-123456
+                        <br />
+                        อีเมล: info@school.ac.th
                     </p>
                 </div>
 

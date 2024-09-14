@@ -110,16 +110,6 @@ const SchoolHistory = () => {
                       <li className="mb-2 text-justify">
                         <strong>ที่ตั้ง:</strong> {infor.current?.address}
                       </li>
-                      <li className="mb-2 text-justify">
-                        <strong>Facebook : </strong>
-                        <a
-                          href={infor.current?.link_facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Klongkhamwittayakarn School
-                        </a>
-                      </li>
                     </ul>
                   </div>
                   <div className="bg-white p-6 rounded-md shadow-md">

@@ -1,10 +1,11 @@
 export interface PersonnelModel {
   id: string;
+  pid: number;
   firstname: string;
   lastname: string;
   prefix: string;
   role: string;
-  sid: string;
+  department: string;
   img: string;
   lvl: string;
 }

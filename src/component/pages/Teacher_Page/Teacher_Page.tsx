@@ -1,5 +1,11 @@
 import { db } from "../../../firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import backgroundImage from "../../../assets/school_history.jpg";
 import { useEffect, useRef, useState } from "react";
 import { PersonnelModel } from "../../../model/persoonal";
@@ -9,18 +15,21 @@ const TeacherPage = () => {
   const personnelRef = collection(db, "personal");
   const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
   const [loading, setLoading] = useState(true);
+ 
   useEffect(() => {
     // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
-    const loadData = onSnapshot(personnelRef, (snapshot) => {
+    const loadData = onSnapshot(personnelRef, async (snapshot) => {
       try {
         if (!snapshot.empty) {
-          const newData = snapshot.docs.map((doc) => ({
-            id: doc.id,
+          const data = await getDocs(
+            query(personnelRef, orderBy("pid", "asc"))
+          );
+          const newData = data.docs.map((doc) => ({
             ...doc.data(),
+            id: doc.id,
           })) as PersonnelModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
           personnel.current = newData; // อัปเดตข้อมูลใน state // อัปเดตข้อมูลใน state
           console.log(personnel.current[0].firstname);
-          
         }
       } catch (error) {
         console.error("Error fetching event data:", error);
@@ -30,7 +39,7 @@ const TeacherPage = () => {
     });
     return () => loadData();
   }, [personnelRef]);
-  
+
   return (
     <>
       {loading ? (

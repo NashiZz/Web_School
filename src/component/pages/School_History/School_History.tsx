@@ -64,13 +64,13 @@ const SchoolHistory = () => {
                       {infor.current?.general_info}
                     </p>
                     <h2 className="text-lg font-bold 24-3">บริบทสำคัญ</h2>
-                    <p className="text-justify">
+                    <p className="text-justify mb-4">
                       {infor.current?.important_context}
                     </p>
-                    <h2 className="text-md font-bold mb-4 ">
+                    <h2 className="text-md font-bold  ">
                       1. วิสัยทัศน์โรงเรียน Vision
                     </h2>
-                    <p className="text-justify">{infor.current?.vision}</p>
+                    <p className="text-justify mb-4">{infor.current?.vision}</p>
                     <h2 className="text-md font-bold ">2. พันธกิจ Mission</h2>
                     <p className="text-justify">
                       2.1 {infor.current?.mission_1}
@@ -84,7 +84,7 @@ const SchoolHistory = () => {
                     <p className="text-justify">
                       2.4 {infor.current?.mission_4}
                     </p>
-                    <p className="text-justify">
+                    <p className="text-justify mb-4">
                       2.5 {infor.current?.mission_5}
                     </p>
                     <h2 className="text-md font-bold ">

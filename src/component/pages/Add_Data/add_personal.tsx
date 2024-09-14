@@ -1,18 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from "../../../firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import { departmentModel } from "../../../model/department";
 import { CircularProgress } from "@mui/material";
-
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import SyncIcon from "@mui/icons-material/Sync";
+import { PersonnelModel } from "../../../model/persoonal";
 const AddPersonalPage = () => {
   const [image, setImage] = useState<string | null>(null);
   const departmentRef = collection(db, "department");
   const department = useRef<departmentModel[]>([]); // กำหนด type ของ state
   const [loading, setLoading] = useState(true);
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [prefix, setPrefix] = useState("");
+  const [role, setRole] = useState("");
+  const [departmentName, setDepartment] = useState("");
+  const [lvl, setLvl] = useState("");
+  const personnelRef = collection(db, "personal");
+  const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
   useEffect(() => {
     // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
-    const loadData = onSnapshot(departmentRef, (snapshot) => {
+    const loadData = onSnapshot(departmentRef, async (snapshot) => {
       try {
         const newData = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -20,7 +37,13 @@ const AddPersonalPage = () => {
         })) as departmentModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
         department.current = newData; // อัปเดตข้อมูลใน state
         console.log(department.current[0].name);
-        
+        const data = await getDocs(query(personnelRef, orderBy("pid", "asc")));
+        const getPersonal = data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        })) as PersonnelModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
+        personnel.current = getPersonal; // อัปเดตข้อมูลใน state // อัปเดตข้อมูลใน state
+        console.log(personnel.current[0].firstname);
       } catch (error) {
         console.log(error);
       } finally {
@@ -29,7 +52,30 @@ const AddPersonalPage = () => {
     });
     return () => loadData();
   }, [departmentRef]);
+ async function handleSubmit() {
+  setLoading(true);
 
+    try {
+      const newPersonnel: PersonnelModel = {
+        pid: personnel.current.length + 1,
+        firstname: firstname,
+        lastname: lastname,
+        prefix: prefix,
+        role: role,
+        department: departmentName,
+        img: image || "",
+        lvl: "",
+        id: "",
+      };
+
+      await addDoc(personnelRef, newPersonnel);
+      console.log("Personnel added successfully");
+    } catch (error) {
+      console.error("Error adding personnel:", error);
+    } finally {
+      setLoading(false);
+    }
+ }
   // ฟังก์ชันสำหรับการอ่านไฟล์รูปภาพ
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -41,6 +87,7 @@ const AddPersonalPage = () => {
       reader.readAsDataURL(file);
     }
   };
+
   return (
     <>
       {loading ? (
@@ -54,20 +101,7 @@ const AddPersonalPage = () => {
               <div className="flex justify-center mb-8">
                 <div className="bg-purple-200  w-40 h-52 flex items-center justify-center cursor-pointer">
                   <label htmlFor="file">
-                    <svg
-                      className="w-12 h-12 text-purple-500 cursor-pointer"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 4v16m8-8H4"
-                      ></path>
-                    </svg>
+                    <AddPhotoAlternateIcon style={{ fontSize: 40 }} />
                   </label>
                   <input
                     id="file"
@@ -90,20 +124,9 @@ const AddPersonalPage = () => {
                     htmlFor="file"
                     className="absolute inset-0 flex items-center justify-center"
                   >
-                    <svg
-                      className="w-12 h-12 text-black cursor-pointer"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 4v16m8-8H4"
-                      ></path>
-                    </svg>
+                    <label htmlFor="file">
+                      <SyncIcon style={{ fontSize: 40 }} />
+                    </label>
                   </label>
                   <input
                     id="file"
@@ -115,17 +138,20 @@ const AddPersonalPage = () => {
                 </div>
               </div>
             )}
-
-            <form>
+   
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
                   คำนำหน้า
                 </label>
                 <div className="relative">
-                  <select className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <option>นาย</option>
-                    <option>นาง</option>
-                    <option>นางสาว</option>
+                  <select
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    value={prefix}
+                    onChange={(e) => setPrefix(e.target.value)}
+                  >
+                    <option value="นาย">นาย</option>
+                    <option value="นาง">นาง</option>
+                    <option value="นางสาว">นางสาว</option>
                   </select>
                 </div>
               </div>
@@ -135,7 +161,9 @@ const AddPersonalPage = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="ขื่อ"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  placeholder="ชื่อ"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -146,16 +174,32 @@ const AddPersonalPage = () => {
                 <input
                   type="text"
                   placeholder="นามสกุล"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">
-                  ตำแหน่ง
+                  ตำแหน่งงาน
                 </label>
                 <input
                   type="text"
                   placeholder="ตำแหน่ง"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                  ตำแหน่งครูทางวิชาการ
+                </label>
+                <input
+                  type="text"
+                  placeholder="ตำแหน่งครู เช่น ครูชำนาญการพิเศษ"
+                  value={lvl}
+                  onChange={(e) => setLvl(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -164,7 +208,10 @@ const AddPersonalPage = () => {
                   แผนก
                 </label>
                 <div className="relative">
-                  <select className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                  <select
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    onChange={(e) => setDepartment(e.target.value)}
+                  >
                     {department.current.map((dept, index) => (
                       <option key={index} value={dept.name}>
                         {dept.name}
@@ -174,15 +221,18 @@ const AddPersonalPage = () => {
                 </div>
               </div>
               <button
-                type="submit"
+                type="button"
+                onClick={()=>
+                  {handleSubmit()}}
                 className="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600"
+                disabled={loading}
               >
-                บันทึกข้อมูล
+                {loading ? 'Saving...' : 'บันทึกข้อมูล'}
               </button>
-            </form>
+          
           </div>
         </div>
-       )} 
+      )}
     </>
   );
 };

@@ -65,13 +65,13 @@ const SchoolHistory = () => {
                       {infor.current?.general_info}
                     </p>
                     <h2 className="text-lg font-bold 24-3">บริบทสำคัญ</h2>
-                    <p className="text-justify">
+                    <p className="text-justify mb-4">
                       {infor.current?.important_context}
                     </p>
-                    <h2 className="text-md font-bold mb-4 ">
+                    <h2 className="text-md font-bold  ">
                       1. วิสัยทัศน์โรงเรียน Vision
                     </h2>
-                    <p className="text-justify">{infor.current?.vision}</p>
+                    <p className="text-justify mb-4">{infor.current?.vision}</p>
                     <h2 className="text-md font-bold ">2. พันธกิจ Mission</h2>
                     <p className="text-justify">
                       2.1 {infor.current?.mission_1}
@@ -85,7 +85,7 @@ const SchoolHistory = () => {
                     <p className="text-justify">
                       2.4 {infor.current?.mission_4}
                     </p>
-                    <p className="text-justify">
+                    <p className="text-justify mb-4">
                       2.5 {infor.current?.mission_5}
                     </p>
                     <h2 className="text-md font-bold ">
@@ -110,16 +110,6 @@ const SchoolHistory = () => {
                       </li>
                       <li className="mb-2 text-justify">
                         <strong>ที่ตั้ง:</strong> {infor.current?.address}
-                      </li>
-                      <li className="mb-2 text-justify">
-                        <strong>Facebook : </strong>
-                        <a
-                          href={infor.current?.link_facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Klongkhamwittayakarn School
-                        </a>
                       </li>
                     </ul>
                   </div>

@@ -13,59 +13,59 @@ import { departmentModel } from "../../../model/department";
 import { CircularProgress } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import SyncIcon from "@mui/icons-material/Sync";
-import { PersonnelModel } from "../../../model/persoonal";
+import { PersonnelModel } from "../../../model/personnel";
+import { PersonnelRequestModel } from "../../../model/personnel_req";
 const AddPersonalPage = () => {
-  const [image, setImage] = useState<string | null>(null);
   const departmentRef = collection(db, "department");
-  const department = useRef<departmentModel[]>([]); // กำหนด type ของ state
-  const [loading, setLoading] = useState(true);
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [prefix, setPrefix] = useState("");
-  const [role, setRole] = useState("");
-  const [departmentName, setDepartment] = useState("");
-  const [lvl, setLvl] = useState("");
   const personnelRef = collection(db, "personal");
-  const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
+  const department = useRef<departmentModel[]>([]);
+  const personnel = useRef<PersonnelModel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState<string | null>(null);
+  const [prefix, setPrefix] = useState("นาย");
+  const firstnameRef = useRef<HTMLInputElement | null>(null);
+  const lastnameRef = useRef<HTMLInputElement | null>(null);
+  const roleRef = useRef<HTMLInputElement | null>(null);
+  const lvlRef = useRef<HTMLInputElement | null>(null);
+  const [departmentName, setDepartment] = useState("");
   useEffect(() => {
-    // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
     const loadData = onSnapshot(departmentRef, async (snapshot) => {
       try {
         const newData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        })) as departmentModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
-        department.current = newData; // อัปเดตข้อมูลใน state
-        console.log(department.current[0].name);
+        })) as departmentModel[];
+        department.current = newData;
         const data = await getDocs(query(personnelRef, orderBy("pid", "asc")));
         const getPersonal = data.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
-        })) as PersonnelModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
-        personnel.current = getPersonal; // อัปเดตข้อมูลใน state // อัปเดตข้อมูลใน state
-        console.log(personnel.current[0].firstname);
+        })) as PersonnelModel[];
+        personnel.current = getPersonal;
       } catch (error) {
         console.log(error);
       } finally {
+        console.log("getData");
         setLoading(false);
       }
     });
-    return () => loadData();
-  }, [departmentRef]);
+      return () => loadData();
+    
+  }, [departmentRef, personnelRef]);
+
  async function handleSubmit() {
   setLoading(true);
 
     try {
-      const newPersonnel: PersonnelModel = {
+      const newPersonnel: PersonnelRequestModel = {
         pid: personnel.current.length + 1,
-        firstname: firstname,
-        lastname: lastname,
+        firstname: firstnameRef.current!.value,
+        lastname: lastnameRef.current!.value,
         prefix: prefix,
-        role: role,
+        role: roleRef.current!.value,
         department: departmentName,
         img: image || "",
-        lvl: "",
-        id: "",
+        lvl: lvlRef.current!.value,
       };
 
       await addDoc(personnelRef, newPersonnel);
@@ -160,11 +160,10 @@ const AddPersonalPage = () => {
                   ชื่อ
                 </label>
                 <input
-                  type="text"
-                  value={firstname}
-                  onChange={(e) => setFirstname(e.target.value)}
+                  ref={firstnameRef}
                   placeholder="ชื่อ"
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -172,11 +171,10 @@ const AddPersonalPage = () => {
                   นามสกุล
                 </label>
                 <input
-                  type="text"
+                ref={lastnameRef}
                   placeholder="นามสกุล"
-                  value={lastname}
-                  onChange={(e) => setLastname(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -184,10 +182,8 @@ const AddPersonalPage = () => {
                   ตำแหน่งงาน
                 </label>
                 <input
-                  type="text"
+                ref={roleRef}
                   placeholder="ตำแหน่ง"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -196,10 +192,8 @@ const AddPersonalPage = () => {
                   ตำแหน่งครูทางวิชาการ
                 </label>
                 <input
-                  type="text"
+                ref={lvlRef}
                   placeholder="ตำแหน่งครู เช่น ครูชำนาญการพิเศษ"
-                  value={lvl}
-                  onChange={(e) => setLvl(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>

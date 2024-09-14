@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import backgroundImage from "../../../assets/school_history.jpg";
 import { useEffect, useRef, useState } from "react";
-import { PersonnelModel } from "../../../model/persoonal";
+import { PersonnelModel } from "../../../model/personnel";
 import { CircularProgress } from "@mui/material";
 
 const TeacherPage = () => {

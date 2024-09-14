@@ -1,5 +1,6 @@
 import backgroundImage from "../../../assets/school_history.jpg";
 import Logo from "../../../assets/logo.png";
+import director from "../../../assets/ผอ.จิตรกร.jpg";
 import { db } from "../../../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
@@ -128,14 +129,14 @@ const SchoolHistory = () => {
                     </h3>
                     <div className="flex items-center justify-center mb-6">
                       <img
-                        src="src\assets\ผอ.จิตรกร.jpg"
+                        src={director}
                         alt="ผู้อำนวยการโรงเรียน"
                         className="h-30"
                       />
                     </div>
                     <ul className="text-gray-700">
                       <li className="mb-2">
-                        <strong>นายประจวบ อินทรโชติ</strong>
+                        <strong>นายจิตกร  โคตะวินนท์</strong>
                       </li>
                       <li className="mb-2">
                         <strong>ผู้อำนวยการโรงเรียนคลองขามวิทยาคาร</strong>

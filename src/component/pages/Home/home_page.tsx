@@ -71,7 +71,7 @@ function Home() {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner1.jpg"
+              src={banner1}
               alt="News Image 1"
               className="w-full h-48 object-cover"
             />
@@ -83,7 +83,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 2"
               className="w-full h-48 object-cover"
             />
@@ -95,7 +95,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 3"
               className="w-full h-48 object-cover"
             />
@@ -107,7 +107,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 4"
               className="w-full h-48 object-cover"
             />
@@ -119,7 +119,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 5"
               className="w-full h-48 object-cover"
             />
@@ -131,7 +131,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 6"
               className="w-full h-48 object-cover"
             />
@@ -161,7 +161,7 @@ function Home() {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner1.jpg"
+              src={banner1}
               alt="News Image 1"
               className="w-full h-48 object-cover"
             />
@@ -173,7 +173,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 2"
               className="w-full h-48 object-cover"
             />
@@ -185,7 +185,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 3"
               className="w-full h-48 object-cover"
             />
@@ -197,7 +197,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 4"
               className="w-full h-48 object-cover"
             />
@@ -209,7 +209,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 5"
               className="w-full h-48 object-cover"
             />
@@ -221,7 +221,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 6"
               className="w-full h-48 object-cover"
             />
@@ -251,7 +251,7 @@ function Home() {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner1.jpg"
+              src={banner1}
               alt="News Image 1"
               className="w-full h-80 object-cover"
             />
@@ -263,7 +263,7 @@ function Home() {
           </div>
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <img
-              src="src\assets\banner3.jpg"
+              src={banner2}
               alt="News Image 2"
               className="w-full h-80 object-cover"
             />

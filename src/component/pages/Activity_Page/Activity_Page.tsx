@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import { styled } from '@mui/material/styles';
+import banner1 from "../../../assets/banner1.jpg";
 
 const ActivityPage = () => {
   const items = Array.from({ length: 22 }, (_, index) => ({
     id: index,
-    src: 'src/assets/banner1.jpg',
+    src: banner1,
   }));
 
   const itemsPerPage = 6;

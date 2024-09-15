@@ -12,28 +12,29 @@ import { PersonnelModel } from "../../../model/personnel";
 import { CircularProgress } from "@mui/material";
 
 const TeacherPage = () => {
-  const personnelRef = collection(db, "personal");
+  const personnelRef = collection(db, "personnel");
   const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
   const [loading, setLoading] = useState(true);
  
   useEffect(() => {
-    // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
     const loadData = onSnapshot(personnelRef, async (snapshot) => {
       try {
         if (!snapshot.empty) {
-          const data = await getDocs(
+          const personnelData = await getDocs(
             query(personnelRef, orderBy("pid", "asc"))
           );
-          const newData = data.docs.map((doc) => ({
+          const getPersonnel = personnelData.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
-          })) as PersonnelModel[]; // แปลงข้อมูลให้ตรงกับประเภทที่กำหนด
-          personnel.current = newData; // อัปเดตข้อมูลใน state // อัปเดตข้อมูลใน state
-          console.log(personnel.current[0].firstname);
+          })) as PersonnelModel[];
+          personnel.current = getPersonnel;
         }
       } catch (error) {
-        console.error("Error fetching event data:", error);
+        console.log(error);
       } finally {
+        console.log(personnel.current.length);
+        
+        console.log("getPersonnel");
         setLoading(false);
       }
     });
@@ -61,14 +62,14 @@ const TeacherPage = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:px-40 xl:pr-40  lg:px-30 lg:pr-30 md:px-20 md:pr-20 sm:px-20 sm:pr-20  px-10 pr-10 pt-10 pb-10">
             {personnel.current.map((item) => (
-              <div className="bg-white rounded-lg shadow-lg relative overflow-hidden">
+              <div key={item.id} className="bg-white rounded-lg shadow-lg relative overflow-hidden">
                 <img
                   src={"src/assets/ผอ.จิตรกร.jpg"}
                   className="w-full h-64 object-cover "
                 />
                 <div className="flex p-4 flex-col justify-center items-center">
                   <h4 className="text-lg font-bold mb-4">{`${item.prefix} ${item.firstname} ${item.lastname}`}</h4>
-                  <h4 className="text-md text-gray-700  mb-2">{item.role}</h4>
+                  <h4 className="text-md text-gray-700  mb-2">{item.position}</h4>
                 </div>
               </div>
             ))}

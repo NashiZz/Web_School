@@ -64,9 +64,8 @@ const PersonnelPage = () => {
             {personnel.current.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-lg shadow-lg relative overflow-hidden w-64"
+                className="bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden w-64 max-w-xs mx-auto"
               >
-                {/* แทนที่ src ของรูปภาพด้วย item.img ที่มาจาก Firestore */}
                 <img
                   src={item.img}
                   alt={`${item.firstname} ${item.lastname}`}

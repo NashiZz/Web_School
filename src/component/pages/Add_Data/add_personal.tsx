@@ -17,44 +17,66 @@ import { PersonnelModel } from "../../../model/personnel";
 import { PersonnelRequestModel } from "../../../model/personnel_req";
 const AddPersonalPage = () => {
   const departmentRef = collection(db, "department");
-  const personnelRef = collection(db, "personal");
+  const personnelRef = collection(db, "personnel");
   const department = useRef<departmentModel[]>([]);
   const personnel = useRef<PersonnelModel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loading2, setLoading2] = useState(true);
   const [image, setImage] = useState<string | null>(null);
   const [prefix, setPrefix] = useState("นาย");
   const firstnameRef = useRef<HTMLInputElement | null>(null);
   const lastnameRef = useRef<HTMLInputElement | null>(null);
-  const roleRef = useRef<HTMLInputElement | null>(null);
-  const lvlRef = useRef<HTMLInputElement | null>(null);
-  const [departmentName, setDepartment] = useState("");
+  const positionRef = useRef<HTMLInputElement | null>(null);
+  const [level, setLevel] = useState("นาย");
+  const [departmentName, setDepartment] = useState("คณะผู้บริหารโรงเรียน");
   useEffect(() => {
     const loadData = onSnapshot(departmentRef, async (snapshot) => {
       try {
-        const newData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as departmentModel[];
-        department.current = newData;
-        const data = await getDocs(query(personnelRef, orderBy("pid", "asc")));
-        const getPersonal = data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        })) as PersonnelModel[];
-        personnel.current = getPersonal;
+        if (!snapshot.empty) {
+          const departmentData = await getDocs(
+            query(departmentRef, orderBy("did", "asc"))
+          );
+          const newData = departmentData.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as departmentModel[];
+          department.current = newData;
+        }
       } catch (error) {
         console.log(error);
       } finally {
-        console.log("getData");
+        console.log("getDepartment");
         setLoading(false);
       }
     });
-      return () => loadData();
-    
-  }, [departmentRef, personnelRef]);
+    return () => loadData();
+  }, [departmentRef]);
 
- async function handleSubmit() {
-  setLoading(true);
+  useEffect(() => {
+    const loadData = onSnapshot(personnelRef, async (snapshot) => {
+      try {
+        if (!snapshot.empty) {
+          const personnelData = await getDocs(
+            query(personnelRef, orderBy("pid", "asc"))
+          );
+          const getPersonnel = personnelData.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          })) as PersonnelModel[];
+          personnel.current = getPersonnel;
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        console.log("getPersonnel");
+        setLoading2(false);
+      }
+    });
+    return () => loadData();
+  }, [personnelRef]);
+
+  async function handleSubmit() {
+    setLoading(true);
 
     try {
       const newPersonnel: PersonnelRequestModel = {
@@ -62,10 +84,10 @@ const AddPersonalPage = () => {
         firstname: firstnameRef.current!.value,
         lastname: lastnameRef.current!.value,
         prefix: prefix,
-        role: roleRef.current!.value,
+        position: positionRef.current!.value,
         department: departmentName,
-        img: image || "",
-        lvl: lvlRef.current!.value,
+        img: "",
+        level: level,
       };
 
       await addDoc(personnelRef, newPersonnel);
@@ -75,7 +97,7 @@ const AddPersonalPage = () => {
     } finally {
       setLoading(false);
     }
- }
+  }
   // ฟังก์ชันสำหรับการอ่านไฟล์รูปภาพ
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -90,7 +112,7 @@ const AddPersonalPage = () => {
 
   return (
     <>
-      {loading ? (
+      {loading && loading2 ? (
         <div className="h-screen w-full flex justify-center items-center">
           <CircularProgress />
         </div>
@@ -138,92 +160,100 @@ const AddPersonalPage = () => {
                 </div>
               </div>
             )}
-   
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  คำนำหน้า
-                </label>
-                <div className="relative">
-                  <select
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    value={prefix}
-                    onChange={(e) => setPrefix(e.target.value)}
-                  >
-                    <option value="นาย">นาย</option>
-                    <option value="นาง">นาง</option>
-                    <option value="นางสาว">นางสาว</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  ชื่อ
-                </label>
-                <input
-                  ref={firstnameRef}
-                  placeholder="ชื่อ"
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                คำนำหน้า
+              </label>
+              <div className="relative">
+                <select
                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                />
+                  value={prefix}
+                  onChange={(e) => setPrefix(e.target.value)}
+                >
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="นางสาว">นางสาว</option>
+                </select>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  นามสกุล
-                </label>
-                <input
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                ชื่อ
+              </label>
+              <input
+                ref={firstnameRef}
+                placeholder="ชื่อ"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                นามสกุล
+              </label>
+              <input
                 ref={lastnameRef}
-                  placeholder="นามสกุล"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  ตำแหน่งงาน
-                </label>
-                <input
-                ref={roleRef}
-                  placeholder="ตำแหน่ง"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  ตำแหน่งครูทางวิชาการ
-                </label>
-                <input
-                ref={lvlRef}
-                  placeholder="ตำแหน่งครู เช่น ครูชำนาญการพิเศษ"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
-                  แผนก
-                </label>
-                <div className="relative">
-                  <select
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    onChange={(e) => setDepartment(e.target.value)}
-                  >
-                    {department.current.map((dept, index) => (
-                      <option key={index} value={dept.name}>
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={()=>
-                  {handleSubmit()}}
-                className="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600"
-                disabled={loading}
+                placeholder="นามสกุล"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                ตำแหน่งงาน
+              </label>
+              <input
+                ref={positionRef}
+                placeholder="ตำแหน่ง"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                วิทยฐานะ
+              </label>
+              <select
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
               >
-                {loading ? 'Saving...' : 'บันทึกข้อมูล'}
-              </button>
-          
+                <option value="ผู้ช่วย">ผู้ช่วย</option>
+                <option value="จิตอาสา">จิตอาสา</option>
+                <option value="ค.ศ 1">ค.ศ 1</option>
+                <option value="ชำนาญการ">ชำนาญการ</option>
+                <option value="ชำนาญการพิเศษ">ชำนาญการพิเศษ</option>
+                <option value="เชี่ยวชาญ">เชี่ยวชาญ</option>
+                <option value="เชียวชาญพิเศษ">เชียวชาญพิเศษ</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                แผนก
+              </label>
+              <div className="relative">
+                <select
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  onChange={(e) => setDepartment(e.target.value)}
+                >
+                  {department.current.map((dept, index) => (
+                    <option key={index} value={dept.name}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                handleSubmit();
+              }}
+              className="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "บันทึกข้อมูล"}
+            </button>
           </div>
         </div>
       )}

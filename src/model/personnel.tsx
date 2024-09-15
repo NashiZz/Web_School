@@ -4,8 +4,8 @@ export interface PersonnelModel {
   firstname: string;
   lastname: string;
   prefix: string;
-  role: string;
+  position: string;
   department: string;
   img: string;
-  lvl: string;
+  level: string;
 }

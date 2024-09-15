@@ -15,7 +15,7 @@ const TeacherPage = () => {
   const personnelRef = collection(db, "personnel");
   const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
   const [loading, setLoading] = useState(true);
- 
+
   useEffect(() => {
     const loadData = onSnapshot(personnelRef, async (snapshot) => {
       try {
@@ -33,7 +33,7 @@ const TeacherPage = () => {
         console.log(error);
       } finally {
         console.log(personnel.current.length);
-        
+
         console.log("getPersonnel");
         setLoading(false);
       }
@@ -60,19 +60,27 @@ const TeacherPage = () => {
               </h1>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:px-40 xl:pr-40  lg:px-30 lg:pr-30 md:px-20 md:pr-20 sm:px-20 sm:pr-20  px-10 pr-10 pt-10 pb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:px-40 xl:pr-40 lg:px-30 lg:pr-30 md:px-20 md:pr-20 sm:px-20 sm:pr-20 px-10 pr-10 pt-10 pb-10">
             {personnel.current.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-lg relative overflow-hidden">
+              <div
+                key={item.id}
+                className="bg-white rounded-lg shadow-lg relative overflow-hidden w-64"
+              >
+                {/* แทนที่ src ของรูปภาพด้วย item.img ที่มาจาก Firestore */}
                 <img
-                  src={"src/assets/ผอ.จิตรกร.jpg"}
-                  className="w-full h-64 object-cover "
+                  src={item.img}
+                  alt={`${item.firstname} ${item.lastname}`}
+                  className="w-full h-80 object-cover mx-auto"
                 />
-                <div className="flex p-4 flex-col justify-center items-center">
-                  <h4 className="text-lg font-bold mb-4">{`${item.prefix} ${item.firstname} ${item.lastname}`}</h4>
-                  <h4 className="text-md text-gray-700  mb-2">{item.position}</h4>
+                <div className="p-2 flex flex-col justify-center items-center">
+                  <h4 className="text-md font-bold mb-2 text-center">
+                    {`${item.prefix} ${item.firstname} ${item.lastname}`}
+                  </h4>
+                  <h4 className="text-sm text-gray-700 text-center">{item.position}</h4>
                 </div>
               </div>
             ))}
+
           </div>
         </div>
       )}

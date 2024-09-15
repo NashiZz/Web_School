@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { db } from "../../../firebase";
+import { db, storage } from "../../../firebase"; 
 import {
   addDoc,
   collection,
@@ -15,6 +15,8 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import SyncIcon from "@mui/icons-material/Sync";
 import { PersonnelModel } from "../../../model/personnel";
 import { PersonnelRequestModel } from "../../../model/personnel_req";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 const AddPersonalPage = () => {
   const departmentRef = collection(db, "department");
   const personnelRef = collection(db, "personnel");
@@ -23,12 +25,26 @@ const AddPersonalPage = () => {
   const [loading, setLoading] = useState(true);
   const [loading2, setLoading2] = useState(true);
   const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [prefix, setPrefix] = useState("นาย");
   const firstnameRef = useRef<HTMLInputElement | null>(null);
   const lastnameRef = useRef<HTMLInputElement | null>(null);
   const positionRef = useRef<HTMLInputElement | null>(null);
   const [level, setLevel] = useState("นาย");
   const [departmentName, setDepartment] = useState("คณะผู้บริหารโรงเรียน");
+
+  const uploadImage = async (file: File) => {
+    try {
+      const storageRef = ref(storage, `personnel/${file.name}`); 
+      await uploadBytes(storageRef, file); 
+      const imageURL = await getDownloadURL(storageRef); 
+      return imageURL;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const loadData = onSnapshot(departmentRef, async (snapshot) => {
       try {
@@ -79,6 +95,11 @@ const AddPersonalPage = () => {
     setLoading(true);
 
     try {
+      let imageURL = "";
+      if (imageFile) {
+        imageURL = (await uploadImage(imageFile)) || "";
+      }
+
       const newPersonnel: PersonnelRequestModel = {
         pid: personnel.current.length + 1,
         firstname: firstnameRef.current!.value,
@@ -86,11 +107,11 @@ const AddPersonalPage = () => {
         prefix: prefix,
         position: positionRef.current!.value,
         department: departmentName,
-        img: "",
+        img: imageURL, 
         level: level,
       };
 
-      await addDoc(personnelRef, newPersonnel);
+      await addDoc(personnelRef, newPersonnel); 
       console.log("Personnel added successfully");
     } catch (error) {
       console.error("Error adding personnel:", error);
@@ -98,10 +119,12 @@ const AddPersonalPage = () => {
       setLoading(false);
     }
   }
+
   // ฟังก์ชันสำหรับการอ่านไฟล์รูปภาพ
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImageFile(file); // เก็บไฟล์รูปภาพที่ถูกเลือก
       const reader = new FileReader();
       reader.onloadend = () => {
         setImage(reader.result as string); // ตั้งค่าผลลัพธ์จากการอ่านเป็น URL

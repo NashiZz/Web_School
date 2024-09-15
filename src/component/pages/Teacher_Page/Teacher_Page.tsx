@@ -66,7 +66,6 @@ const TeacherPage = () => {
                 key={item.id}
                 className="bg-white rounded-lg shadow-lg relative overflow-hidden w-64"
               >
-                {/* แทนที่ src ของรูปภาพด้วย item.img ที่มาจาก Firestore */}
                 <img
                   src={item.img}
                   alt={`${item.firstname} ${item.lastname}`}
@@ -80,7 +79,6 @@ const TeacherPage = () => {
                 </div>
               </div>
             ))}
-
           </div>
         </div>
       )}

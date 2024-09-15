@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { PersonnelModel } from "../../../model/personnel";
 import { CircularProgress } from "@mui/material";
 
-const TeacherPage = () => {
+const PersonnelPage = () => {
   const personnelRef = collection(db, "personnel");
   const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
   const [loading, setLoading] = useState(true);
@@ -76,11 +76,12 @@ const TeacherPage = () => {
                   <h4 className="text-md font-bold mb-2 text-center">
                     {`${item.prefix} ${item.firstname} ${item.lastname}`}
                   </h4>
-                  <h4 className="text-sm text-gray-700 text-center">{item.position}</h4>
+                  <h4 className="text-sm text-gray-700 text-center">
+                    {item.position}
+                  </h4>
                 </div>
               </div>
             ))}
-
           </div>
         </div>
       )}
@@ -88,4 +89,4 @@ const TeacherPage = () => {
   );
 };
 
-export default TeacherPage;
+export default PersonnelPage;

@@ -106,7 +106,7 @@ function Header() {
                 {!isScrolled && (
                   <>
                     <h5 className="text-gray-500 text-xs md:text-lg mb-1">
-                      Klongkhamwittayakan School
+                      Klongkhamwittayakarn School
                     </h5>
                     <h5 className="text-gray-500 text-xs md:text-sm mb-1">
                       สังกัดองค์การบริหารส่วนจังหวัดกาฬสินธุ์

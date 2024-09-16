@@ -62,6 +62,7 @@ const PersonnelPage = () => {
 
     loadData();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departmentName]);
 
   return (
@@ -101,6 +102,9 @@ const PersonnelPage = () => {
                   </h4>
                   <h4 className="text-sm text-gray-700 text-center">
                     {item.position}
+                  </h4>
+                  <h4 className="text-sm text-gray-400 text-center">
+                    {item.level != undefined ? `ครู${item.level}` : ""}
                   </h4>
                 </div>
               </div>

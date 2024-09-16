@@ -145,34 +145,28 @@ function Header() {
               >
                 หน้าแรก
               </Link>
-              <div
+              {/* <div
                 className="relative"
                 onMouseEnter={() => handleDropdownMouseEnter("about")}
               >
                 <button className="block text-gray-700 hover:text-white py-2 items-center">
                   เกี่ยวกับโรงเรียน
                   <FontAwesomeIcon icon={faChevronDown} className="ml-2" />
-                </button>
-                {dropdownOpen === "about" && (
+                </button> */}
+                {/* {dropdownOpen === "about" && (
                   <div
                     className="absolute left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg w-48 z-20"
                     onMouseLeave={handleDropdownMouseLeave}
-                  >
+                  > */}
                     <Link
                       to="/school_history"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className="block text-gray-700 hover:text-white py-2"
                     >
                       ประวัติโรงเรียน
                     </Link>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      วิสัยทัศน์
-                    </a>
-                  </div>
-                )}
-              </div>
+                  {/* </div> */}
+                {/* )} */}
+              {/* </div> */}
               <div className="relative" onMouseEnter={() => handleDropdownMouseEnter("humen")}>
                 <button className="block text-gray-700 hover:text-white py-2 items-center">
                   บุคลากรโรงเรียน

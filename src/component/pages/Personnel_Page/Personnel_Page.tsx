@@ -20,6 +20,8 @@ const PersonnelPage = () => {
   const { deptName } = useParams();
 
   useEffect(() => {
+    console.log(deptName);
+    
     const loadData = onSnapshot(personnelRef, async (snapshot) => {
       try {
         if (!snapshot.empty) {

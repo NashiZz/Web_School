@@ -183,7 +183,7 @@ function Header() {
                     {department.current.map((dept, index) => (
                       <Link
                         key={index}
-                        to={`/personnel/${dept.name}`}
+                        to={"/personnel/"+dept.name}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
                         {dept.name}

@@ -8,20 +8,19 @@ import {
   where,
 } from "firebase/firestore";
 import backgroundImage from "../../../assets/school_history.jpg";
-import { useEffect, useReducer } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PersonnelModel } from "../../../model/personnel";
 import { CircularProgress } from "@mui/material";
 import { useParams } from "react-router-dom";
 
 const PersonnelPage = () => {
-  const { departmentName } = useParams<{ departmentName: string }>();
   const personnelRef = collection(db, "personnel");
-  const personnel = useRef<PersonnelModel[]>([]); // กำหนด type ของ state
+  const personnel = useRef<PersonnelModel[]>([]);
   const [loading, setLoading] = useState(true);
   const { deptName } = useParams();
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = onSnapshot(personnelRef, async (snapshot) => {
       try {
         if (!snapshot.empty) {
           const personnelData = await getDocs(
@@ -36,19 +35,16 @@ const PersonnelPage = () => {
       } catch (error) {
         console.error("Error fetching personnel data: ", error);
       } finally {
-        console.log(personnel.current.length);
-        console.log(deptName);
-
         console.log("getPersonnel");
         setLoading(false);
       }
-    });
-    return () => loadData();
+    })
+  return () => loadData();
   }, [deptName, personnelRef]);
 
   return (
     <>
-      {state.loading ? (
+      {loading ? (
         <div className="h-screen w-full flex justify-center items-center">
           <CircularProgress />
         </div>

@@ -21,7 +21,7 @@ import { db } from "../../firebase";
 import { departmentModel } from "../../model/department";
 import { CircularProgress } from "@mui/material";
 
-type DropdownMenu = "about" | "humen" | ""; 
+type DropdownMenu = "about" | "humen" | "";
 
 function Header() {
   const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -106,7 +106,7 @@ function Header() {
                 {!isScrolled && (
                   <>
                     <h5 className="text-gray-500 text-xs md:text-lg mb-1">
-                      Klongkhamwittayakarn School
+                      Klongkhamwittayakan School
                     </h5>
                     <h5 className="text-gray-500 text-xs md:text-sm mb-1">
                       สังกัดองค์การบริหารส่วนจังหวัดกาฬสินธุ์
@@ -183,7 +183,7 @@ function Header() {
                     {department.current.map((dept, index) => (
                       <Link
                         key={index}
-                        to={"/personnel/"+dept.name}
+                        to={`/personnel/${dept.name}`}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
                         {dept.name}

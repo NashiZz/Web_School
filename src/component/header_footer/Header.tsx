@@ -21,7 +21,7 @@ import { db } from "../../firebase";
 import { departmentModel } from "../../model/department";
 import { CircularProgress } from "@mui/material";
 
-type DropdownMenu = "about" | "humen" | ""; // Define the possible values for dropdownOpen
+type DropdownMenu = "about" | "humen" | ""; 
 
 function Header() {
   const [showSearch, setShowSearch] = useState<boolean>(false);
@@ -86,18 +86,16 @@ function Header() {
         </div>
       ) : (
         <header
-          className={`bg-header shadow-md sticky top-0 z-50 transition-all duration-300 ${
-            isScrolled ? "py-1" : "py-2"
-          }`}
+          className={`bg-header shadow-md sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-1" : "py-2"
+            }`}
         >
           <div className="container mx-auto px-4 flex flex-wrap items-center justify-between relative">
             <div className="flex items-center w-full md:w-auto">
               <img
                 src={Logo}
                 alt="Logo"
-                className={`mr-3 transition-all duration-300 my-3 ${
-                  isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
-                } object-contain`}
+                className={`mr-3 transition-all duration-300 my-3 ${isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
+                  } object-contain`}
                 style={{ maxWidth: "100px" }}
               />
 
@@ -120,9 +118,8 @@ function Header() {
               <img
                 src={Logo2}
                 alt="Logo2"
-                className={`ml-3 transition-all duration-300 my-3 ${
-                  isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
-                } object-contain`}
+                className={`ml-3 transition-all duration-300 my-3 ${isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
+                  } object-contain`}
                 style={{ maxWidth: "100px" }}
               />
             </div>
@@ -138,11 +135,9 @@ function Header() {
             </button>
 
             <nav
-              className={`md:flex ${
-                isScrolled ? "md:space-x-4" : "md:space-x-6"
-              } ${
-                isMobileMenuOpen ? "block" : "hidden"
-              } w-full md:w-auto transition-all duration-300`}
+              className={`md:flex ${isScrolled ? "md:space-x-4" : "md:space-x-6"
+                } ${isMobileMenuOpen ? "block" : "hidden"
+                } w-full md:w-auto transition-all duration-300`}
             >
               <Link
                 to="/"
@@ -178,23 +173,17 @@ function Header() {
                   </div>
                 )}
               </div>
-              <div
-                className="relative"
-                onMouseEnter={() => handleDropdownMouseEnter("humen")}
-              >
+              <div className="relative" onMouseEnter={() => handleDropdownMouseEnter("humen")}>
                 <button className="block text-gray-700 hover:text-white py-2 items-center">
                   บุคลากรโรงเรียน
                   <FontAwesomeIcon icon={faChevronDown} className="ml-2" />
                 </button>
                 {dropdownOpen === "humen" && (
-                  <div
-                    className="absolute left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20"
-                    onMouseLeave={handleDropdownMouseLeave}
-                  >
+                  <div className="absolute left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20" onMouseLeave={handleDropdownMouseLeave}>
                     {department.current.map((dept, index) => (
                       <Link
                         key={index}
-                        to={`/show${dept}`}
+                        to={`/personnel/${dept.name}`}
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
                         {dept.name}

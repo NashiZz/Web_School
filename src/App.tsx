@@ -21,7 +21,7 @@ const routers = createBrowserRouter([
         path: "/school_history",
         element: <SchoolHistory />
       },
-      { path: "/showpersonnel/:id", element: <PersonnelPage/> },
+      { path: "/personnel/:departmentName", element: <PersonnelPage/> },
       { path: "/show_activity", element: <ActivityPage/> },
       { path: "/activity/:id", element: <DetailAct_Page /> },
       { path: "/add_data", element: <AddData_Page/> },

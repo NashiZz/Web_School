@@ -9,20 +9,18 @@ import { CircularProgress } from "@mui/material";
 
 const SchoolHistory = () => {
   const inforRef = collection(db, "information_school");
-  const infor = useRef<InformationSchoolModel>(); // กำหนด type ของ state
+  const infor = useRef<InformationSchoolModel>(); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // ฟังข้อมูลแบบเรียลไทม์จาก Firestore
     const loadData = onSnapshot(inforRef, (snapshot) => {
       try {
         if (!snapshot.empty) {
-          // ตรวจสอบว่ามีข้อมูลใน snapshot หรือไม่
           const docData = {
-            id: snapshot.docs[0].id, // กรณีข้อมูลเดียว เลือกเอกสารแรก
+            id: snapshot.docs[0].id, 
             ...snapshot.docs[0].data(),
           } as InformationSchoolModel;
-          infor.current = docData; // อัปเดตข้อมูลใน state
+          infor.current = docData;
         }
       } catch (error) {
         console.error("Error fetching event data:", error);
@@ -54,56 +52,38 @@ const SchoolHistory = () => {
 
           <div className="bg-gray-100 py-12">
             <div className="container mx-auto px-4">
-              <div className="flex flex-wrap -mx-4">
-                {/* Left Column: School History */}
-                <div className="w-full md:w-2/3 px-4 mb-8 md:mb-0">
-                  <div className="bg-white p-6 rounded-md shadow-md">
-                    <h2 className="text-xl font-bold mb-4 text-center">
-                      ข้อมูลพื้นฐาน
-                    </h2>
-                    <p className="text-justify">
-                      {infor.current?.general_info}
-                    </p>
-                    <h2 className="text-lg font-bold 24-3">บริบทสำคัญ</h2>
-                    <p className="text-justify mb-4">
-                      {infor.current?.important_context}
-                    </p>
-                    <h2 className="text-md font-bold  ">
-                      1. วิสัยทัศน์โรงเรียน Vision
-                    </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
+                <div className="md:col-span-2">
+                  <div className="bg-white p-6 rounded-md shadow-md h-full">
+                    <h2 className="text-xl font-bold mb-4 text-center">ข้อมูลพื้นฐาน</h2>
+                    <p className="text-justify mb-4">{infor.current?.general_info}</p>
+
+                    <h2 className="text-lg font-bold mb-3">บริบทสำคัญ</h2>
+                    <p className="text-justify mb-4">{infor.current?.important_context}</p>
+
+                    <h2 className="text-md font-bold">1. วิสัยทัศน์โรงเรียน Vision</h2>
                     <p className="text-justify mb-4">{infor.current?.vision}</p>
-                    <h2 className="text-md font-bold ">2. พันธกิจ Mission</h2>
-                    <p className="text-justify">
-                      2.1 {infor.current?.mission_1}
-                    </p>
-                    <p className="text-justify">
-                      2.2 {infor.current?.mission_2}
-                    </p>
-                    <p className="text-justify">
-                      2.3 {infor.current?.mission_3}
-                    </p>
-                    <p className="text-justify">
-                      2.4 {infor.current?.mission_4}
-                    </p>
-                    <p className="text-justify mb-4">
-                      2.5 {infor.current?.mission_5}
-                    </p>
-                    <h2 className="text-md font-bold ">
-                      3. จุดมุ่งหมายเพื่อพัฒนาการศึกษา
-                    </h2>
-                    <p className="text-justify">3.1 {infor.current?.goal_1}</p>
-                    <p className="text-justify">3.2 {infor.current?.goal_2}</p>
-                    <p className="text-justify">3.3 {infor.current?.goal_3}</p>
+
+                    <h2 className="text-md font-bold">2. พันธกิจ Mission</h2>
+                    <p className="text-justify mb-4">2.1 {infor.current?.mission_1}</p>
+                    <p className="text-justify mb-4">2.2 {infor.current?.mission_2}</p>
+                    <p className="text-justify mb-4">2.3 {infor.current?.mission_3}</p>
+                    <p className="text-justify mb-4">2.4 {infor.current?.mission_4}</p>
+                    <p className="text-justify mb-4">2.5 {infor.current?.mission_5}</p>
+
+                    <h2 className="text-md font-bold">3. จุดมุ่งหมายเพื่อพัฒนาการศึกษา</h2>
+                    <p className="text-justify mb-4">3.1 {infor.current?.goal_1}</p>
+                    <p className="text-justify mb-4">3.2 {infor.current?.goal_2}</p>
+                    <p className="text-justify mb-4">3.3 {infor.current?.goal_3}</p>
                   </div>
                 </div>
-                <div className="w-full md:w-1/3 px-4">
-                  <div className="bg-white p-6 mb-5 rounded-md shadow-md">
+
+                <div className="space-y-5">
+                  <div className="bg-white p-6 rounded-md shadow-md">
                     <div className="flex items-center justify-center mb-6">
                       <img src={Logo} alt="ตราโรงเรียน" className="h-35" />
                     </div>
-                    <h3 className="text-lg font-bold mb-4 text-center">
-                      ตราโรงเรียน
-                    </h3>
+                    <h3 className="text-lg font-bold mb-4 text-center">ตราโรงเรียน</h3>
                     <ul className="text-gray-700">
                       <li className="mb-2 text-justify">
                         <strong>วันก่อตั้ง :</strong> 10 พฤษภาคม พ.ศ. 2536
@@ -113,22 +93,17 @@ const SchoolHistory = () => {
                       </li>
                     </ul>
                   </div>
+
                   <div className="bg-white p-6 rounded-md shadow-md">
-                    <h3 className="text-lg font-bold mb-4 text-center">
-                      ผู้อำนวยการโรงเรียน
-                    </h3>
+                    <h3 className="text-lg font-bold mb-4 text-center">ผู้อำนวยการโรงเรียน</h3>
                     <div className="flex items-center justify-center mb-6">
-                      <img
-                        src={director}
-                        alt="ผู้อำนวยการโรงเรียน"
-                        className="h-30"
-                      />
+                      <img src={director} alt="ผู้อำนวยการโรงเรียน" className="h-30" />
                     </div>
                     <ul className="text-gray-700">
-                      <li className="mb-2">
+                      <li className="mb-2 text-center">
                         <strong>นายจิตกร  โคตะวินนท์</strong>
                       </li>
-                      <li className="mb-2">
+                      <li className="mb-2 text-center">
                         <strong>ผู้อำนวยการโรงเรียนคลองขามวิทยาคาร</strong>
                       </li>
                     </ul>

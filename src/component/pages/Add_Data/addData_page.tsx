@@ -11,16 +11,18 @@ import 'react-datepicker/dist/react-datepicker.css';
 import SyncIcon from "@mui/icons-material/Sync";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { CircularProgress } from "@mui/material";
-import { ActivityModel } from "../../../model/activity";
+
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ActivityRequestModel } from "../../../model/activity_req";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Timestamp } from "firebase/firestore";
+import { activityModel } from "../../../model/activitys";
+import { activityRequestModel } from "../../../model/activity_req";
 
 const AddData_Page = () => {
     const activityRef = collection(db, "activitys");
-    const activity = useRef<ActivityModel[]>([]);
+    const activity = useRef<activityModel[]>([]);
     const [image, setImage] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);  
@@ -73,7 +75,7 @@ const AddData_Page = () => {
                     const getActivity = activityData.docs.map((doc) => ({
                         ...doc.data(),
                         id: doc.id,
-                    })) as ActivityModel[];
+                    })) as activityModel[];
                     activity.current = getActivity;
                 }
             } catch (error) {
@@ -103,7 +105,7 @@ const AddData_Page = () => {
                 imageURL = (await uploadImage(imageFile)) || "";
             }
 
-            const newActivity: ActivityRequestModel = {
+            const newActivity: activityRequestModel = {
                 title: titleRef.current.value,
                 body: bodyRef.current.value,
                 date_activity: timestamp,

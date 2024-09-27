@@ -1,6 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-export interface activityModel {
-    id:string;
+export interface activityRequestModel {
     body: string;
     img: string;
     title: string;

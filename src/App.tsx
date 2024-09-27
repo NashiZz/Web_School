@@ -22,7 +22,7 @@ const routers = createBrowserRouter([
         element: <SchoolHistory />
       },
       { path: "/personnel/:departmentName", element: <PersonnelPage /> },
-      { path: "/show_activity", element: <ActivityPage /> },
+      { path: "/show_activity/:activity", element: <ActivityPage /> },
       { path: "/activity/:id", element: <DetailAct_Page /> },
       { path: "/add_data", element: <AddData_Page /> },
       { path: "/addpersonal", element: <AddPersonalPage /> },

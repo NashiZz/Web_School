@@ -62,7 +62,7 @@ const ActivityPage = () => {
     } else if (activity === "ผลงาน") {
       fetchData("works", currentPage);
     } else if (activity === "ข่าวสาร") {
-      fetchData("works", currentPage);
+      fetchData("news", currentPage);
     }
   }, [activity, currentPage]); // โหลดข้อมูลใหม่เมื่อ activity หรือ page เปลี่ยน
 

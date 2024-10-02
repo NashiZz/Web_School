@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import banner from "../../../assets/banner2.jpg";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { db, storage } from "../../../firebase";
 import banner1 from "../../../assets/banner1.jpg";
 import banner2 from "../../../assets/banner3.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,13 +10,19 @@ import {
   faChalkboardTeacher,
   faChevronLeft,
   faChevronRight,
+  faEye,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import UploadImage from "../../../services/upload_img";
+import Modal from "../../../services/modal";
+import { deleteObject, getStorage, ref } from "firebase/storage";
 
-const banners = [banner, banner1, banner2];
-
-function Home() {
+const Home = () => {
+  const [banners, setBanners] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [sortedBanners, setSortedBanners] = useState<string[]>([]);
 
   const goToPrevious = () => {
     const isFirstSlide = currentIndex === 0;
@@ -29,10 +36,47 @@ function Home() {
     setCurrentIndex(newIndex);
   };
 
+  const fetchBanners = async () => {
+    const bannerSnapshot = await getDocs(collection(db, "banners_school"));
+    const bannerUrls = bannerSnapshot.docs.map((doc) => doc.data().imageUrl);
+    setBanners(bannerUrls);
+    setSortedBanners(bannerUrls);
+  };
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(goToNext, 4000);
     return () => clearInterval(interval);
   }, [currentIndex]);
+
+  const deleteBanner = async (bannerUrl: string) => {
+    try {
+      const storagePath = `${bannerUrl}`;
+      const storageRef = ref(storage, storagePath);
+
+      const bannerDocRef = await getDocs(collection(db, "banners_school"));
+      const bannerToDelete = bannerDocRef.docs.find(doc => doc.data().imageUrl === bannerUrl);
+      if (bannerToDelete) {
+        await deleteDoc(doc(db, "banners_school", bannerToDelete.id));
+      }
+
+      await deleteObject(storageRef);
+
+      // Reload banners after deletion
+      await fetchBanners();
+      alert("ลบรูปภาพสำเร็จ!");
+    } catch (error) {
+      console.error("Error deleting banner:", error);
+    }
+  };
+
+  const handleUploadSuccess = async () => {
+    // Reload banners after successful upload
+    await fetchBanners();
+  };
 
   return (
     <>
@@ -41,7 +85,7 @@ function Home() {
           className="flex transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
         >
-          {banners.map((banner, index) => (
+          {sortedBanners.map((banner, index) => (
             <img
               key={index}
               src={banner}
@@ -64,6 +108,40 @@ function Home() {
         >
           <FontAwesomeIcon icon={faChevronRight} className="h-6 w-6" />
         </button>
+      </div>
+      <div className="mt-5 text-center">
+        <h2 className="text-lg font-semibold mb-2">เพิ่มรูปภาพ Banner ใหม่</h2>
+        <UploadImage onSuccess={handleUploadSuccess} />
+        <button
+          onClick={() => setModalIsOpen(true)}
+          className="mt-4 bg-teal-700 text-white rounded-md p-2 shadow-md hover:bg-teal-600 transition-colors duration-300"
+        >
+          <FontAwesomeIcon icon={faEye} className="mr-2" />
+          ดูรูปภาพที่มีอยู่
+        </button>
+
+        <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+          <h2 className="text-lg font-semibold mb-2">รูปภาพที่มีอยู่</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sortedBanners.map((banner, index) => (
+              <div key={index} className="relative">
+                <img src={banner} alt={`Banner ${index}`} className="w-full h-[200px] object-cover" />
+                <button
+                  onClick={() => deleteBanner(banner)}
+                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 shadow-md hover:bg-red-500 transition-colors duration-300"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => setModalIsOpen(false)}
+            className="mt-4 bg-red-500 text-white rounded-md p-2 shadow-md hover:bg-red-400 transition-colors duration-300"
+          >
+            ปิด
+          </button>
+        </Modal>
       </div>
       <div className="container mx-auto  ">
         <div className="relative container mx-auto py-8 ">
@@ -245,7 +323,7 @@ function Home() {
         </div>
       </div>
 
-      
+
 
       <div className="container mx-auto  ">
         <div className="relative container mx-auto py-8">

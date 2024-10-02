@@ -25,7 +25,7 @@ const AddData_Page = () => {
     const activity = useRef<activityModel[]>([]);
     const [image, setImage] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
-    const [loading, setLoading] = useState(false);  
+    const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(true);
     const titleRef = useRef<HTMLInputElement | null>(null);
     const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -38,8 +38,11 @@ const AddData_Page = () => {
             return collection(db, "activitys");
         } else if (type === "news") {
             return collection(db, "news");
-        } else {
-            return collection(db, "works"); 
+        } else if (type === "works") {
+            return collection(db, "works");
+        }
+        else {
+            return collection(db, "news");
         }
     };
 
@@ -127,7 +130,7 @@ const AddData_Page = () => {
         } catch (error) {
             console.error("Error adding activity:", error);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     }
 
@@ -199,7 +202,7 @@ const AddData_Page = () => {
                             <div className="relative">
                                 <select className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     value={type}
-                                    onChange={(e) => setType(e.target.value)}                               
+                                    onChange={(e) => setType(e.target.value)}
                                 >
                                     <option value="news">ข่าวสาร</option>
                                     <option value="activitys">กิจกรรม</option>

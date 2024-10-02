@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { throttle } from "lodash";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.png";
 import Logo2 from "../../assets/logo2.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,9 +17,10 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { auth, db } from "../../firebase";
 import { departmentModel } from "../../model/department";
 import { CircularProgress } from "@mui/material";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 type DropdownMenu = "about" | "humen" | "activity" | "";
 
@@ -32,13 +33,40 @@ function Header() {
   const department = useRef<departmentModel[]>([]);
   const ActivitiesoOrWorks = ["กิจกรรม", "ผลงาน"];
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null); // เก็บข้อมูลผู้ใช้
+  const navigate = useNavigate();
+
   const handleDropdownMouseEnter = (menu: DropdownMenu) => {
     setDropdownOpen(menu);
   };
-  
+
 
   const handleDropdownMouseLeave = () => {
     setDropdownOpen("");
+  };
+
+  // ตรวจสอบสถานะการเข้าสู่ระบบ
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser); // ตั้งค่าผู้ใช้ถ้ามีการเข้าสู่ระบบ
+      } else {
+        setUser(null); // ตั้งค่าเป็น null ถ้าไม่มีการเข้าสู่ระบบ
+      }
+    });
+
+    return () => unsubscribe(); // ยกเลิก listener เมื่อคอมโพเนนต์ถูกทำลาย
+  }, []);
+
+  // ลงชื่อออก
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   useEffect(() => {
@@ -88,18 +116,16 @@ function Header() {
         </div>
       ) : (
         <header
-          className={`bg-header shadow-md sticky top-0 z-50 transition-all duration-300 ${
-            isScrolled ? "py-1" : "py-2"
-          }`}
+          className={`bg-header shadow-md sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-1" : "py-2"
+            }`}
         >
           <div className="container mx-auto px-4 flex flex-wrap items-center justify-between relative">
             <div className="flex items-center w-full md:w-auto">
               <img
                 src={Logo}
                 alt="Logo"
-                className={`mr-3 transition-all duration-300 my-3 ${
-                  isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
-                } object-contain`}
+                className={`mr-3 transition-all duration-300 my-3 ${isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
+                  } object-contain`}
                 style={{ maxWidth: "100px" }}
               />
 
@@ -122,9 +148,8 @@ function Header() {
               <img
                 src={Logo2}
                 alt="Logo2"
-                className={`ml-3 transition-all duration-300 my-3 ${
-                  isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
-                } object-contain`}
+                className={`ml-3 transition-all duration-300 my-3 ${isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
+                  } object-contain`}
                 style={{ maxWidth: "100px" }}
               />
             </div>
@@ -140,11 +165,9 @@ function Header() {
             </button>
 
             <nav
-              className={`md:flex ${
-                isScrolled ? "md:space-x-4" : "md:space-x-6"
-              } ${
-                isMobileMenuOpen ? "block" : "hidden"
-              } w-full md:w-auto transition-all duration-300`}
+              className={`md:flex ${isScrolled ? "md:space-x-4" : "md:space-x-6"
+                } ${isMobileMenuOpen ? "block" : "hidden"
+                } w-full md:w-auto transition-all duration-300`}
             >
               <Link
                 to="/"
@@ -202,7 +225,7 @@ function Header() {
               <div
                 className="relative"
                 onMouseEnter={() => handleDropdownMouseEnter("activity")}
-                
+
               >
                 <button className="block text-gray-700 hover:text-white py-2 items-center">
                   กิจกรรม/ผลงาน
@@ -244,6 +267,22 @@ function Header() {
               >
                 <FontAwesomeIcon icon={faSearch} className="h-6 w-6" />
               </button>
+              
+              {user ? (
+                <button
+                  className="block text-gray-700 hover:text-white py-2"
+                  onClick={handleLogout}
+                >
+                  ออกจากระบบ
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="block text-gray-700 hover:text-white py-2"
+                >
+                  เข้าสู่ระบบ
+                </Link>
+              )}
             </div>
           </div>
         </header>

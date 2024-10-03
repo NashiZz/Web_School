@@ -1,7 +1,13 @@
 import {
   Avatar,
   Box,
+  Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   IconButton,
   List,
@@ -14,9 +20,9 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { db } from "../../../firebase";
 import { PersonnelModel } from "../../../model/personnel";
-import React, { useEffect, useReducer,} from "react";
+import React, { useEffect, useReducer } from "react";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete"; 
+import DeleteIcon from "@mui/icons-material/Delete";
 interface PersonnelState {
   personnel: PersonnelModel[];
   loading: boolean;
@@ -48,14 +54,23 @@ const ShowAllPersonnel = () => {
     personnel: [],
     loading: true,
   });
-//   const totalPages = useRef(0);
-//   const currentPage = useRef(1);
-//   const StyledPagination = styled(Pagination)({
-//     "& .MuiPaginationItem-page.Mui-selected": {
-//       backgroundColor: "#d9f99d", // lime-200
-//       color: "#000",
-//     },
-//   });
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+  //   const totalPages = useRef(0);
+  //   const currentPage = useRef(1);
+  //   const StyledPagination = styled(Pagination)({
+  //     "& .MuiPaginationItem-page.Mui-selected": {
+  //       backgroundColor: "#d9f99d", // lime-200
+  //       color: "#000",
+  //     },
+  //   });
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -122,18 +137,43 @@ const ShowAllPersonnel = () => {
                       </React.Fragment>
                     }
                   />
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      sx={{
-                        padding: "5px",
-                        marginRight: "8px",
-                        color: "green",
-                      }}
-                    >
-                      <EditIcon fontSize="medium" />
-                    </IconButton>
+                  <div style={{ display: "flex", alignItems: "center" }} >
+                    <React.Fragment >
+                      <IconButton
+                        edge="end"
+                        aria-label="edit"
+                        sx={{
+                          padding: "5px",
+                          marginRight: "8px",
+                          color: "green",
+                        }}
+                        onClick={handleClickOpen}
+                      >
+                        <EditIcon fontSize="medium" />
+                      </IconButton>
+                      <Dialog
+                        open={open}
+                        onClose={handleClose}
+                        
+                      >
+                        <DialogTitle id="alert-dialog-title">
+                          {"Use Google's location service?"}
+                        </DialogTitle>
+                        <DialogContent>
+                          <DialogContentText id="alert-dialog-description">
+                            Let Google help apps determine location. This means
+                            sending anonymous location data to Google, even when
+                            no apps are running.
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleClose}>Disagree</Button>
+                          <Button onClick={handleClose} autoFocus>
+                            Agree
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                    </React.Fragment>
                     <IconButton
                       edge="end"
                       aria-label="delete"
@@ -160,4 +200,3 @@ const ShowAllPersonnel = () => {
 };
 
 export default ShowAllPersonnel;
-

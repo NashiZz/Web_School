@@ -114,7 +114,8 @@ const ActivityPage = () => {
                         : "ไม่ระบุวันที่"}
                     </p>
                     <Link
-                      to={`/activity/${item.id}`}
+                     to={`/activity/${item.id}`} 
+                     state={{ item }} 
                       className="text-red-600 hover:underline"
                     >
                       Read more

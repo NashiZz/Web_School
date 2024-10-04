@@ -1,26 +1,24 @@
-import { useParams } from 'react-router-dom';
+
 import banner from "../../../assets/banner1.jpg";
+import { useParams, useLocation } from 'react-router-dom';
 
 const DetailAct_Page = () => {
-    const { id } = useParams<{ id: string }>(); // กำหนดให้ id เป็น string
-    const activityItems = [
-        { id: 0, title: '“ผู้บริหาร ข้าราชการ และเจ้าหน้าที่การปรับแก้ไขคะแนนความประพฤติ”', date: '17 มีนาคม 2567', src: banner, description: 'ผู้บริหาร ข้าราชการ และเจ้าหน้าที่ของวิทยาลัยอาชีวศึกษาอุดรธานี ไม่ให้และไม่รับของขวัญและของกำนัลทุกประเภทจากการปฏิบัติหน้าที่' },
-    ];
+  const { id } = useParams();  // ดึง id จาก URL
+  const location = useLocation();  // ดึง state ที่ส่งมาผ่าน Link
+  const { item } = location.state || {};  
+  console.log(item);
+  // รับค่า item จาก state
 
-    // ตรวจสอบว่า id ไม่ใช่ undefined ก่อนการใช้ parseInt
-    const activity = activityItems.find(item => item.id === parseInt(id ?? '', 10));
-
-    if (!activity) {
-        return <div>ไม่พบข่าว</div>;
-    }
+  if (!item) {
+    return <div>ไม่พบกิจกรรม</div>;  // ถ้าไม่มีข้อมูลแสดงข้อความไม่พบกิจกรรม
+  }
 
     return (
-        <div className="bg-purple-100 py-12 px-6">
+        <div className="bg-purple-100 py-12 px-6 ">
             <div className="container mx-auto max-w-2xl bg-white rounded-lg shadow-lg relative">
-
                 <div className="relative">
                     <img
-                        src={activity.src}
+                        src={item.img}
                         alt="No Image"
                         className="w-full h-80 object-cover rounded-t-lg shadow-lg"
                     />
@@ -28,18 +26,17 @@ const DetailAct_Page = () => {
 
                 <div className="text-center p-6 mt-10">
                     <p className="text-2xl font-semibold text-gray-800">
-                        {activity.title}
+                        {item.title}
                     </p>
-                    <p className="text-1xl font-semibold text-gray-600 mt-2">{activity.date}</p>
+                    <p className="text-1xl font-semibold text-gray-600 mt-2">{item.date_activity
+                        ? `วันที่ ${item.date_activity
+                            .toDate()
+                            .toLocaleDateString("th-TH")}`
+                        : "ไม่ระบุวันที่"}</p>
                 </div>
-
                 <div className="py-4">
-                    <p className="text-blue-600 text-sm font-medium text-left px-6">
-                        #Khongkham #คลองขามวิทยาคาร <br />
-                        #โรงเรียนคลองขามวิทยาคาร
-                    </p>
                     <p className="text-sm text-gray-700 leading-relaxed text-left py-3 px-6">
-                        {activity.description}
+                        {item.body}
                     </p>
                 </div>
 

@@ -2,6 +2,7 @@ export interface InformationSchoolModel {
   id: string;
   general_info: string;
   important_context: string;
+  founding_date: string;
   address: string;
   goal_1: string;
   goal_2: string;

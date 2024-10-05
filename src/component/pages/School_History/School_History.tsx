@@ -1,5 +1,4 @@
 import backgroundImage from "../../../assets/school_history.jpg";
-import Logo from "../../../assets/logo.png";
 import director from "../../../assets/ผอ.จิตรกร.jpg";
 import { db } from "../../../firebase";
 import { collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
@@ -7,9 +6,11 @@ import { useEffect, useRef, useState } from "react";
 import { InformationSchoolModel } from "../../../model/information_school";
 import { CircularProgress } from "@mui/material";
 import { getAuth } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const SchoolHistory = () => {
   const auth = getAuth();
+  const storage = getStorage(); // Firebase Storage
   const currentUser = auth.currentUser;
   const inforRef = collection(db, "information_school");
   const infor = useRef<InformationSchoolModel>();
@@ -22,7 +23,11 @@ const SchoolHistory = () => {
     vision: "",
     missions: Array(5).fill(""),
     goals: Array(3).fill(""),
+    founding_date: "",
+    address: "",
+    school_emblem_img: "", // เก็บ URL ของรูปภาพ
   });
+  const [imageFile, setImageFile] = useState<File | null>(null); // เก็บไฟล์รูปภาพที่ผู้ใช้เลือก
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -52,6 +57,9 @@ const SchoolHistory = () => {
           vision: docData.vision,
           missions: [docData.mission_1, docData.mission_2, docData.mission_3, docData.mission_4, docData.mission_5],
           goals: [docData.goal_1, docData.goal_2, docData.goal_3],
+          founding_date: docData.founding_date,
+          address: docData.address,
+          school_emblem_img: docData.school_emblem_img, // เพิ่มฟิลด์รูปภาพ
         });
       }
       setLoading(false);
@@ -60,6 +68,18 @@ const SchoolHistory = () => {
     return () => loadData();
   }, []);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUpdatedFields((prev) => ({ ...prev, school_emblem_img: reader.result as string })); // แสดงรูปที่เลือกไว้
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     setSaveSuccess(false);
@@ -67,7 +87,17 @@ const SchoolHistory = () => {
 
     if (infor.current) {
       const docRef = doc(db, "information_school", infor.current.id);
+
       try {
+        let imageUrl = updatedFields.school_emblem_img;
+
+        // ถ้ามีการเลือกไฟล์รูปภาพใหม่ ให้ทำการอัปโหลด
+        if (imageFile) {
+          const imageRef = ref(storage, `school_emblems/${imageFile.name}`);
+          await uploadBytes(imageRef, imageFile);
+          imageUrl = await getDownloadURL(imageRef); // ได้ URL ของรูปภาพที่อัปโหลดใหม่
+        }
+
         await updateDoc(docRef, {
           general_info: updatedFields.generalInfo,
           important_context: updatedFields.context,
@@ -80,7 +110,11 @@ const SchoolHistory = () => {
           goal_1: updatedFields.goals[0],
           goal_2: updatedFields.goals[1],
           goal_3: updatedFields.goals[2],
+          founding_date: updatedFields.founding_date,
+          address: updatedFields.address,
+          school_emblem_img: imageUrl, // บันทึก URL รูปภาพที่อัปโหลดใหม่
         });
+
         setSaveSuccess(true);
         setEditing(false);
       } catch (error) {
@@ -100,6 +134,9 @@ const SchoolHistory = () => {
         vision: infor.current.vision,
         missions: [infor.current.mission_1, infor.current.mission_2, infor.current.mission_3, infor.current.mission_4, infor.current.mission_5],
         goals: [infor.current.goal_1, infor.current.goal_2, infor.current.goal_3],
+        founding_date: infor.current.founding_date,
+        address: infor.current.address,
+        school_emblem_img: infor.current.school_emblem_img,
       });
     }
     setEditing(false);
@@ -230,36 +267,81 @@ const SchoolHistory = () => {
 
                 <div className="space-y-5">
                   <div className="bg-white p-6 rounded-md shadow-md">
-                    <div className="flex items-center justify-center mb-6">
-                      <img src={Logo} alt="ตราโรงเรียน" className="h-35" />
-                    </div>
-                    <h3 className="text-lg font-bold mb-4 text-center">ตราโรงเรียน</h3>
-                    <ul className="text-gray-700">
-                      <li className="mb-2 text-justify">
-                        <strong>วันก่อตั้ง :</strong> 10 พฤษภาคม พ.ศ. 2536
-                      </li>
-                      <li className="mb-2 text-justify">
-                        <strong>ที่ตั้ง:</strong> {infor.current?.address}
-                      </li>
-                    </ul>
+                    {editing ? (
+                      <>
+                        <div className="mb-4">
+                          <label className="block mb-2">เลือกรูปภาพตราโรงเรียน:</label>
+                          <input type="file" accept="image/*" onChange={handleImageChange} />
+                        </div>
+                        {/* แสดงรูปภาพที่เลือกหรือรูปเดิม */}
+                        {updatedFields.school_emblem_img && (
+                          <img
+                            src={updatedFields.school_emblem_img}
+                            alt="ตราโรงเรียน"
+                            className="h-35 mb-4"
+                          />
+                        )}
+                        <textarea
+                          className="w-full p-2 border rounded-md mb-4"
+                          value={updatedFields.founding_date}
+                          onChange={(e) => handleChange('founding_date', e.target.value)}
+                        />
+                        <textarea
+                          className="w-full p-2 border rounded-md mb-4"
+                          value={updatedFields.address}
+                          onChange={(e) => handleChange('address', e.target.value)}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-center mb-6">
+                          <img src={updatedFields.school_emblem_img} alt="ตราโรงเรียน" className="h-35" />
+                        </div>
+                        <h3 className="text-lg font-bold mb-4 text-center">ตราโรงเรียน</h3>
+                        <ul className="text-gray-700">
+                          <li className="mb-2 text-justify">
+                            <strong>วันก่อตั้ง :</strong> {infor.current?.founding_date}
+                          </li>
+                          <li className="mb-2 text-justify">
+                            <strong>ที่ตั้ง:</strong> {infor.current?.address}
+                          </li>
+                        </ul>
+                      </>
+                    )}
                   </div>
 
                   <div className="bg-white p-6 rounded-md shadow-md">
-                    <h3 className="text-lg font-bold mb-4 text-center">ผู้อำนวยการโรงเรียน</h3>
-                    <div className="flex items-center justify-center mb-6">
-                      <img src={director} alt="ผู้อำนวยการโรงเรียน" className="h-30" />
-                    </div>
-                    <ul className="text-gray-700">
-                      <li className="mb-2 text-center">
-                        <strong>นายจิตกร  โคตะวินนท์</strong>
-                      </li>
-                      <li className="mb-2 text-center">
-                        <strong>ผู้อำนวยการโรงเรียนคลองขามวิทยาคาร</strong>
-                      </li>
-                    </ul>
+                    {editing ? (
+                      <>
+                        <textarea
+                          className="w-full p-2 border rounded-md mb-4"
+                          value={updatedFields.founding_date}
+                          onChange={(e) => handleChange('generalInfo', e.target.value)}
+                        />
+                        <textarea
+                          className="w-full p-2 border rounded-md mb-4"
+                          value={updatedFields.address}
+                          onChange={(e) => handleChange('context', e.target.value)}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="text-lg font-bold mb-4 text-center">ผู้อำนวยการโรงเรียน</h3>
+                        <div className="flex items-center justify-center mb-6">
+                          <img src={director} alt="ผู้อำนวยการโรงเรียน" className="h-30" />
+                        </div>
+                        <ul className="text-gray-700">
+                          <li className="mb-2 text-center">
+                            <strong>นายจิตกร  โคตะวินนท์</strong>
+                          </li>
+                          <li className="mb-2 text-center">
+                            <strong>ผู้อำนวยการโรงเรียนคลองขามวิทยาคาร</strong>
+                          </li>
+                        </ul>
+                      </>
+                    )}
                   </div>
                 </div>
-
               </div>
             </div>
           </div>

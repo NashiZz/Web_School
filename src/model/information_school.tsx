@@ -17,5 +17,6 @@ export interface InformationSchoolModel {
   mission_5: string;
   school_name: string;
   school_plan_img: string;
+  school_emblem_img: string;
   vision: string;
 }

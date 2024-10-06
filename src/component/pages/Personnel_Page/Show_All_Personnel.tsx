@@ -218,7 +218,7 @@ const ShowAllPersonnel = () => {
   };
   return (
     <>
-      <form className="max-w-lg mx-auto">
+      <form className="max-w-lg mx-auto mt-6">
         <div className="flex">
           <div className="relative w-full">
             <input

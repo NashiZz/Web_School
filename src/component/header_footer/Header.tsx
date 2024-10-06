@@ -31,7 +31,7 @@ function Header() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const departmentRef = collection(db, "department");
   const department = useRef<departmentModel[]>([]);
-  const ActivitiesoOrWorks = ["กิจกรรม", "ผลงาน"];
+  const ActivitiesoOrWorks = ["กิจกรรม", "ผลงาน","ข่าวสาร"];
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null); // เก็บข้อมูลผู้ใช้
   const navigate = useNavigate();
@@ -63,6 +63,7 @@ function Header() {
     try {
       await signOut(auth);
       setUser(null);
+      localStorage.setItem('isAdmin',"false");
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);

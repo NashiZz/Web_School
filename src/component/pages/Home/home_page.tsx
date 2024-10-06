@@ -35,7 +35,9 @@ const Home = () => {
         const userData = doc.data();
         if (userData.role === "admin") {
           setIsAdmin(true);
+          
         } else {
+          
           navigate("/");
         }
       });
@@ -47,8 +49,10 @@ const Home = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        localStorage.setItem('isAdmin',"true");
         checkAdminStatus(user.uid);
       } else {
+        localStorage.setItem('isAdmin',"false");
         navigate("/");
       }
     });

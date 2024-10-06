@@ -8,4 +8,5 @@ export interface PersonnelModel {
   department: string;
   img: string;
   level: string;
+  isLeader: boolean;
 }

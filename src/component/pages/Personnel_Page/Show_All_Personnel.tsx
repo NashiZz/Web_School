@@ -23,7 +23,7 @@ import {
   doc,
 } from "firebase/firestore";
 import EditIcon from "@mui/icons-material/Edit";
-import { db, storage } from "../../../firebase"; 
+import { db, storage } from "../../../firebase";
 import { PersonnelModel } from "../../../model/personnel";
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -100,8 +100,8 @@ const ShowAllPersonnel = () => {
         img: imageURL!, // Image URL from upload
         level: level,
         pid: pid,
-        isLeader: isChecked,
-      } as PersonnelRequestModel; 
+        isLeader: isChecked ? isChecked : false,
+      } as PersonnelRequestModel;
 
       // Reference the document by ID and update it
       const personnelDoc = doc(personnelRef, activePersonId);
@@ -112,10 +112,13 @@ const ShowAllPersonnel = () => {
       console.error("Error updating personnel:", error);
     } finally {
       setLoading(false);
+      setOpen(false);
     }
   };
 
-  const handleCheckboxChange = (e: { target: { checked: boolean | ((prevState: boolean) => boolean); }; }) => {
+  const handleCheckboxChange = (e: {
+    target: { checked: boolean | ((prevState: boolean) => boolean) };
+  }) => {
     setIsChecked(e.target.checked);
   };
 
@@ -128,8 +131,8 @@ const ShowAllPersonnel = () => {
     setLevel(person.level || "ผู้ช่วย");
     setImage(person.img || null);
     setDepartment(person.department || "");
-    setPid(person.pid)
-    setIsChecked(person.isLeader)
+    setPid(person.pid);
+    setIsChecked(person.isLeader);
     setOpen(true);
   };
 
@@ -139,7 +142,7 @@ const ShowAllPersonnel = () => {
   };
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadDataPersonnel = async () => {
       try {
         dispatch({ type: "SET_LOADING", payload: true });
 
@@ -162,7 +165,7 @@ const ShowAllPersonnel = () => {
       }
     };
 
-    loadData();
+    loadDataPersonnel();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -189,12 +192,12 @@ const ShowAllPersonnel = () => {
     });
     return () => loadData();
   }, [departmentRef]);
-  
+
   const uploadImage = async (file: File) => {
     try {
-      const storageRef = ref(storage, `personnel/${file.name}`); 
-      await uploadBytes(storageRef, file); 
-      const imageURL = await getDownloadURL(storageRef); 
+      const storageRef = ref(storage, `personnel/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const imageURL = await getDownloadURL(storageRef);
       return imageURL;
     } catch (error) {
       console.error("Error uploading image: ", error);
@@ -215,6 +218,40 @@ const ShowAllPersonnel = () => {
   };
   return (
     <>
+      <form className="max-w-lg mx-auto">
+        <div className="flex">
+          <div className="relative w-full">
+            <input
+              type="search"
+              id="search-dropdown"
+              className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-lime-100  border-lime-200"
+              placeholder="Search"
+            />
+            <button
+              type="submit"
+              className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-black bg-lime-200 rounded-e-lg border border-lime-200 hover:bg-lime-200 focus:ring-4 focus:outline-none focus:ring-bg-lime-200 dark:bg-lime-200 dark:hover:bg-lime-200 dark:focus:ring-lime-200"
+            >
+              <svg
+                className="w-4 h-4"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                />
+              </svg>
+              <span className="sr-only">Search</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
       {state.loading ? (
         <div className="h-screen w-full flex justify-center items-center">
           <CircularProgress />
@@ -445,7 +482,11 @@ const ShowAllPersonnel = () => {
                             {/* Save and close buttons */}
                             <DialogActions>
                               <Button onClick={handleClose}>ยกเลิก</Button>
-                              <Button   onClick={handleSubmit} >{loading ? "กำลังการแก้ไขบันทึกข้อมูล..." : "แก้ไขข้อมูล"}</Button>
+                              <Button onClick={handleSubmit}>
+                                {loading
+                                  ? "กำลังการแก้ไขบันทึกข้อมูล..."
+                                  : "แก้ไขข้อมูล"}
+                              </Button>
                             </DialogActions>
                           </div>
                         )}

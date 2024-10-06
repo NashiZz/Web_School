@@ -7,5 +7,6 @@ export interface PersonnelRequestModel {
   department: string;
   img: string;
   level: string;
+  isLeader: boolean;
   }
   

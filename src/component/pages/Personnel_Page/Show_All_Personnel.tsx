@@ -19,14 +19,18 @@ import {
   query,
   orderBy,
   onSnapshot,
+  updateDoc,
+  doc,
 } from "firebase/firestore";
 import EditIcon from "@mui/icons-material/Edit";
-import { db } from "../../../firebase";
+import { db, storage } from "../../../firebase"; 
 import { PersonnelModel } from "../../../model/personnel";
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { departmentModel } from "../../../model/department";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { PersonnelRequestModel } from "../../../model/personnel_req";
 interface PersonnelState {
   personnel: PersonnelModel[];
   loading: boolean;
@@ -69,19 +73,64 @@ const ShowAllPersonnel = () => {
   const [image, setImage] = useState<string | null>(null);
   const department = useRef<departmentModel[]>([]);
   const [departmentName, setDepartment] = useState("");
+  // State to keep track of the checkbox's checked status
+  const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pid, setPid] = useState(0);
+  const handleSubmit = async () => {
+    if (!activePersonId) {
+      console.error("No active person ID for editing");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      let imageURL = image; // Keep the existing image URL if no new image is uploaded
+      if (imageFile) {
+        imageURL = (await uploadImage(imageFile)) || "";
+      }
+
+      const updatedPersonnel: Partial<PersonnelRequestModel> = {
+        firstname: firstname, // Use state value
+        lastname: lastname, // Use state value
+        prefix: prefix, // Use state value
+        position: position, // Use state value
+        department: departmentName, // Use state value
+        img: imageURL!, // Image URL from upload
+        level: level,
+        pid: pid,
+        isLeader: isChecked,
+      } as PersonnelRequestModel; 
+
+      // Reference the document by ID and update it
+      const personnelDoc = doc(personnelRef, activePersonId);
+      await updateDoc(personnelDoc, updatedPersonnel);
+
+      console.log("Personnel updated successfully");
+    } catch (error) {
+      console.error("Error updating personnel:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCheckboxChange = (e: { target: { checked: boolean | ((prevState: boolean) => boolean); }; }) => {
+    setIsChecked(e.target.checked);
+  };
 
   const handleClickOpen = (person: PersonnelModel) => {
     setActivePersonId(person.id);
     setPrefix(person.prefix || "นาย");
-
-    // Update states instead of ref values
     setFirstname(person.firstname);
     setLastname(person.lastname);
-    setPosition(person.position || ""); // Handle null or undefined positions
+    setPosition(person.position || "");
     setLevel(person.level || "ผู้ช่วย");
     setImage(person.img || null);
     setDepartment(person.department || "");
-    setOpen(true); // Open dialog
+    setPid(person.pid)
+    setIsChecked(person.isLeader)
+    setOpen(true);
   };
 
   const handleClose = () => {
@@ -94,7 +143,9 @@ const ShowAllPersonnel = () => {
       try {
         dispatch({ type: "SET_LOADING", payload: true });
 
-        const personnelData = await getDocs(query(personnelRef));
+        const personnelData = await getDocs(
+          query(personnelRef, orderBy("pid", "asc"))
+        );
 
         const getPersonnel = personnelData.docs.map((doc) => ({
           ...doc.data(),
@@ -138,7 +189,18 @@ const ShowAllPersonnel = () => {
     });
     return () => loadData();
   }, [departmentRef]);
-
+  
+  const uploadImage = async (file: File) => {
+    try {
+      const storageRef = ref(storage, `personnel/${file.name}`); 
+      await uploadBytes(storageRef, file); 
+      const imageURL = await getDownloadURL(storageRef); 
+      return imageURL;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      return null;
+    }
+  };
   // ฟังก์ชันสำหรับการอ่านไฟล์รูปภาพ
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -290,9 +352,7 @@ const ShowAllPersonnel = () => {
                               </label>
                               <input
                                 // ref={firstnameRef}
-                                onChange={(e) =>
-                                  setFirstname(e.target.value)
-                                }
+                                onChange={(e) => setFirstname(e.target.value)}
                                 value={firstname}
                                 placeholder="ชื่อ"
                                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -306,9 +366,7 @@ const ShowAllPersonnel = () => {
                               </label>
                               <input
                                 value={lastname}
-                                onChange={(e) =>
-                                  setLastname(e.target.value)
-                                }
+                                onChange={(e) => setLastname(e.target.value)}
                                 placeholder="นามสกุล"
                                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 required
@@ -321,9 +379,7 @@ const ShowAllPersonnel = () => {
                               </label>
                               <input
                                 value={position}
-                                onChange={(e) =>
-                                  setPosition(e.target.value)
-                                }
+                                onChange={(e) => setPosition(e.target.value)}
                                 placeholder="ตำแหน่ง"
                                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                               />
@@ -349,6 +405,7 @@ const ShowAllPersonnel = () => {
                                 <option value="เชียวชาญพิเศษ">
                                   เชียวชาญพิเศษ
                                 </option>
+                                <option value="ไม่มี">ไม่มี</option>
                               </select>
                             </div>
                             <div className="mb-4">
@@ -371,10 +428,24 @@ const ShowAllPersonnel = () => {
                                 </select>
                               </div>
                             </div>
+                            <div>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={handleCheckboxChange}
+                                />
+                                <span className="ml-2 bg-blend-color-dodge text-md">
+                                  เป็นหัวหน้าหรือไม่{" "}
+                                  {isChecked ? "เป็น" : "ไม่เป็น"}
+                                </span>
+                              </label>
+                            </div>
+
                             {/* Save and close buttons */}
                             <DialogActions>
                               <Button onClick={handleClose}>ยกเลิก</Button>
-                              <Button autoFocus>บันทึกการแก้ไข</Button>
+                              <Button   onClick={handleSubmit} >{loading ? "กำลังการแก้ไขบันทึกข้อมูล..." : "แก้ไขข้อมูล"}</Button>
                             </DialogActions>
                           </div>
                         )}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { db, storage } from "../../../firebase"; 
+import { db, storage } from "../../../firebase";
 import {
   addDoc,
   collection,
@@ -32,12 +32,18 @@ const AddPersonalPage = () => {
   const positionRef = useRef<HTMLInputElement | null>(null);
   const [level, setLevel] = useState("นาย");
   const [departmentName, setDepartment] = useState("คณะผู้บริหารโรงเรียน");
+  const [isChecked, setIsChecked] = useState(false);
+  const handleCheckboxChange = (e: {
+    target: { checked: boolean | ((prevState: boolean) => boolean) };
+  }) => {
+    setIsChecked(e.target.checked);
+  };
 
   const uploadImage = async (file: File) => {
     try {
-      const storageRef = ref(storage, `personnel/${file.name}`); 
-      await uploadBytes(storageRef, file); 
-      const imageURL = await getDownloadURL(storageRef); 
+      const storageRef = ref(storage, `personnel/${file.name}`);
+      await uploadBytes(storageRef, file);
+      const imageURL = await getDownloadURL(storageRef);
       return imageURL;
     } catch (error) {
       console.error("Error uploading image: ", error);
@@ -107,11 +113,12 @@ const AddPersonalPage = () => {
         prefix: prefix,
         position: positionRef.current!.value,
         department: departmentName,
-        img: imageURL, 
+        img: imageURL,
         level: level,
+        isLeader: isChecked,
       };
 
-      await addDoc(personnelRef, newPersonnel); 
+      await addDoc(personnelRef, newPersonnel);
       console.log("Personnel added successfully");
     } catch (error) {
       console.error("Error adding personnel:", error);
@@ -267,6 +274,18 @@ const AddPersonalPage = () => {
                 </select>
               </div>
             </div>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={handleCheckboxChange}
+                />
+                <span className="ml-2 bg-blend-color-dodge text-md">
+                  เป็นหัวหน้าหรือไม่ {isChecked ? "เป็น" : "ไม่เป็น"}
+                </span>
+              </label>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -275,7 +294,7 @@ const AddPersonalPage = () => {
               className="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-600"
               disabled={loading}
             >
-              {loading ? "Saving..." : "บันทึกข้อมูล"}
+              {loading ? "กำลังบันทึกข้อมูล..." : "บันทึกข้อมูล"}
             </button>
           </div>
         </div>

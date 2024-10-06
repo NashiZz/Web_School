@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { InformationSchoolModel } from "../../../model/information_school";
 import { CircularProgress } from "@mui/material";
 import { getAuth } from "firebase/auth";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
 const SchoolHistory = () => {
   const auth = getAuth();
@@ -25,9 +25,9 @@ const SchoolHistory = () => {
     goals: Array(3).fill(""),
     founding_date: "",
     address: "",
-    school_emblem_img: "", // เก็บ URL ของรูปภาพ
+    school_emblem_img: "",
   });
-  const [imageFile, setImageFile] = useState<File | null>(null); // เก็บไฟล์รูปภาพที่ผู้ใช้เลือก
+  const [imageFile, setImageFile] = useState<File | null>(null); 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -59,7 +59,7 @@ const SchoolHistory = () => {
           goals: [docData.goal_1, docData.goal_2, docData.goal_3],
           founding_date: docData.founding_date,
           address: docData.address,
-          school_emblem_img: docData.school_emblem_img, // เพิ่มฟิลด์รูปภาพ
+          school_emblem_img: docData.school_emblem_img, 
         });
       }
       setLoading(false);
@@ -74,7 +74,7 @@ const SchoolHistory = () => {
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUpdatedFields((prev) => ({ ...prev, school_emblem_img: reader.result as string })); // แสดงรูปที่เลือกไว้
+        setUpdatedFields((prev) => ({ ...prev, school_emblem_img: reader.result as string })); 
       };
       reader.readAsDataURL(file);
     }
@@ -91,11 +91,16 @@ const SchoolHistory = () => {
       try {
         let imageUrl = updatedFields.school_emblem_img;
 
-        // ถ้ามีการเลือกไฟล์รูปภาพใหม่ ให้ทำการอัปโหลด
         if (imageFile) {
+          if (infor.current?.school_emblem_img) {
+            const oldImageRef = ref(storage, infor.current.school_emblem_img);
+            await deleteObject(oldImageRef);
+          }
+
           const imageRef = ref(storage, `school_emblems/${imageFile.name}`);
           await uploadBytes(imageRef, imageFile);
-          imageUrl = await getDownloadURL(imageRef); // ได้ URL ของรูปภาพที่อัปโหลดใหม่
+
+          imageUrl = await getDownloadURL(imageRef);
         }
 
         await updateDoc(docRef, {
@@ -112,7 +117,7 @@ const SchoolHistory = () => {
           goal_3: updatedFields.goals[2],
           founding_date: updatedFields.founding_date,
           address: updatedFields.address,
-          school_emblem_img: imageUrl, // บันทึก URL รูปภาพที่อัปโหลดใหม่
+          school_emblem_img: imageUrl,
         });
 
         setSaveSuccess(true);
@@ -125,6 +130,7 @@ const SchoolHistory = () => {
       }
     }
   };
+
 
   const handleCancel = () => {
     if (infor.current) {
@@ -273,7 +279,6 @@ const SchoolHistory = () => {
                           <label className="block mb-2">เลือกรูปภาพตราโรงเรียน:</label>
                           <input type="file" accept="image/*" onChange={handleImageChange} />
                         </div>
-                        {/* แสดงรูปภาพที่เลือกหรือรูปเดิม */}
                         {updatedFields.school_emblem_img && (
                           <img
                             src={updatedFields.school_emblem_img}

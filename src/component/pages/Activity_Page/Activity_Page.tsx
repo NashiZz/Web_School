@@ -19,7 +19,12 @@ import { CircularProgress } from "@mui/material";
 import SyncIcon from "@mui/icons-material/Sync";
 import DatePicker from "react-datepicker";
 import { Timestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 const itemsPerPage = 6; // จำนวนรายการต่อหน้า
 
 const ActivityPage = () => {
@@ -37,7 +42,6 @@ const ActivityPage = () => {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
   const fetchData = async (collectionName: string, page: number) => {
     try {
       setLoading(true);
@@ -52,12 +56,12 @@ const ActivityPage = () => {
       if (lastVisible && page > 1) {
         q = query(
           colRef,
-          orderBy("create_at", "desc"),
+          orderBy("date_activity", "desc"),
           startAfter(lastVisible),
           limit(itemsPerPage)
         );
       } else {
-        q = query(colRef, orderBy("create_at", "desc"), limit(itemsPerPage));
+        q = query(colRef, orderBy("date_activity", "desc"), limit(itemsPerPage));
       }
 
       const snapshot = await getDocs(q);
@@ -81,7 +85,9 @@ const ActivityPage = () => {
       await deleteDoc(doc(db, collectionName, id));
       setData((prevData) => prevData.filter((item) => item.id !== id));
       console.log("Document successfully deleted!");
-      fetchData(collectionName, currentPage);
+      const oldImageRef = ref(storage,selected?.img);
+      await deleteObject(oldImageRef);
+      window.location.reload();
     } catch (error) {
       console.error("Error removing document: ", error);
     }
@@ -140,21 +146,43 @@ const ActivityPage = () => {
     const docRef = doc(db, collectionName, selected.id); // ใช้ selected.id
 
     try {
-      console.log(title);
-      console.log(selectedDate);
-      console.log(body);
+      let imageUrl = image;
 
+      if (imageFile) {
+        if (selected?.img) {
+          const oldImageRef = ref(storage,selected.img);
+          await deleteObject(oldImageRef);
+        }
+
+
+        let storageRef: any = "";
+        if (activity === "กิจกรรม") {
+          storageRef = 'activitys';
+        } else if (activity === "ผลงาน") {
+          storageRef = 'works';
+        } else if (activity === "ข่าวสาร") {
+          storageRef = 'ข่าวสาร';
+        }
+
+        const imageRef = ref(storage, `${storageRef}/${Timestamp.now()}${imageFile.name}`);
+        await uploadBytes(imageRef, imageFile);
+
+        imageUrl = await getDownloadURL(imageRef);
+        console.log(imageRef);
+      }
       
+      
+
       // let imageURL = "";
       // if (imageFile) {
       //   imageURL = (await uploadImage(imageFile)) || "";
       // }
 
-      
       await updateDoc(docRef, {
         title: title,
         body: body,
-        date_activity:selectedDate,
+        date_activity: selectedDate,
+        img:imageUrl
       });
       setSelectedItem(null);
       setIsOpenEdit(false);
@@ -414,7 +442,7 @@ const ActivityPage = () => {
                                 </label>
                                 <input
                                   value={title} // ใช้ title state แทน
-                                  onChange={(e) => setTitle(e.target.value)} 
+                                  onChange={(e) => setTitle(e.target.value)}
                                   type="text"
                                   placeholder="หัวเรื่อง"
                                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -444,8 +472,8 @@ const ActivityPage = () => {
                                   รายละเอียด
                                 </label>
                                 <textarea
-                                 value={body} // ใช้ title state แทน
-                                 onChange={(e) => setBody(e.target.value)} 
+                                  value={body} // ใช้ title state แทน
+                                  onChange={(e) => setBody(e.target.value)}
                                   placeholder="รายละเอียด"
                                   className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                   rows={4}

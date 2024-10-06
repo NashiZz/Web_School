@@ -48,7 +48,7 @@ const AddData_Page = () => {
 
     const uploadImage = async (file: File) => {
         try {
-            const storageRef = ref(storage, `${type}/${file.name}`);
+            const storageRef = ref(storage, `${type}/${Timestamp.now()}${file.name}`);
             await uploadBytes(storageRef, file);
             const imageURL = await getDownloadURL(storageRef);
             return imageURL;

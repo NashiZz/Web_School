@@ -60,28 +60,27 @@ const ShowAllPersonnel = () => {
   const departmentRef = collection(db, "department");
   const [open, setOpen] = React.useState(false);
   const [activePersonId, setActivePersonId] = React.useState("");
-  const [image, setImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [prefix, setPrefix] = useState("นาย");
-  const firstnameRef = useRef<HTMLInputElement | null>(null);
-  const lastnameRef = useRef<HTMLInputElement | null>(null);
-  const positionRef = useRef<HTMLInputElement | null>(null);
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [position, setPosition] = useState("");
   const [level, setLevel] = useState("นาย");
+  const [image, setImage] = useState<string | null>(null);
   const department = useRef<departmentModel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [departmentName, setDepartment] = useState("");
+
   const handleClickOpen = (person: PersonnelModel) => {
     setActivePersonId(person.id);
     setPrefix(person.prefix || "นาย");
 
-    if (firstnameRef.current) {
-      firstnameRef.current.value = person.firstname; 
-    }
-    if (lastnameRef.current) {
-      lastnameRef.current.value = person.lastname; 
-    }
-  // positionRef.current.value = person.position; 
-    setLevel(person.level || "ผู้ช่วย"); 
-    setImage(person.img || null); 
+    // Update states instead of ref values
+    setFirstname(person.firstname);
+    setLastname(person.lastname);
+    setPosition(person.position || ""); // Handle null or undefined positions
+    setLevel(person.level || "ผู้ช่วย");
+    setImage(person.img || null);
+    setDepartment(person.department || "");
     setOpen(true); // Open dialog
   };
 
@@ -89,14 +88,7 @@ const ShowAllPersonnel = () => {
     setOpen(false);
     setActivePersonId("");
   };
-  //   const totalPages = useRef(0);
-  //   const currentPage = useRef(1);
-  //   const StyledPagination = styled(Pagination)({
-  //     "& .MuiPaginationItem-page.Mui-selected": {
-  //       backgroundColor: "#d9f99d", // lime-200
-  //       color: "#000",
-  //     },
-  //   });
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -141,7 +133,7 @@ const ShowAllPersonnel = () => {
         console.log(error);
       } finally {
         console.log("getDepartment");
-        setLoading(false);
+        // setLoading(false);
       }
     });
     return () => loadData();
@@ -214,16 +206,15 @@ const ShowAllPersonnel = () => {
                         <EditIcon fontSize="medium" />
                       </IconButton>
                       <Dialog
-                      maxWidth="sm"
-                      fullWidth 
-                      
-                      PaperProps={{
-                        style: {
-                          maxHeight: '90vh',
-                          overflowY: 'auto',
-                          margin: '0 auto',
-                        },
-                      }}
+                        // maxWidth="sm"
+                        // fullWidth
+                        PaperProps={{
+                          style: {
+                            // maxHeight: "90vh",
+                            overflowY: "auto",
+                            margin: "0 auto",
+                          },
+                        }}
                         open={open && activePersonId === person.id}
                         onClose={handleClose}
                       >
@@ -232,133 +223,159 @@ const ShowAllPersonnel = () => {
                             <CircularProgress />
                           </div>
                         ) : (
-                          <div className="bg-purple-100 py-12 px-6 flex items-center justify-center">
-                            <div className="container max-w-md bg-white p-8 rounded-lg shadow-lg">
-                              {/* Image upload */}
-                              {!image ? (
-                                <div className="flex justify-center mb-8">
-                                  <div className="bg-purple-200 w-40 h-52 flex items-center justify-center cursor-pointer">
-                                    <label htmlFor="file">
-                                      <AddPhotoAlternateIcon
-                                        style={{ fontSize: 40 }}
-                                      />
-                                    </label>
-                                    <input
-                                      id="file"
-                                      type="file"
-                                      accept="image/*"
-                                      onChange={handleImageChange}
-                                      style={{ display: "none" }}
+                          <div className="container max-w-md bg-white p-8 rounded-lg shadow-lg">
+                            {/* Image upload */}
+                            {!image ? (
+                              <div className="flex justify-center mb-8">
+                                <div className="bg-purple-200 w-40 h-52 flex items-center justify-center cursor-pointer">
+                                  <label htmlFor="file">
+                                    <AddPhotoAlternateIcon
+                                      style={{ fontSize: 40 }}
                                     />
-                                  </div>
+                                  </label>
+                                  <input
+                                    id="file"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    style={{ display: "none" }}
+                                  />
                                 </div>
-                              ) : (
-                                <div className="flex justify-center mb-8">
-                                  <div className="bg-purple-200 w-40 h-52 flex items-center justify-center cursor-pointer relative">
-                                    <img
-                                      src={image}
-                                      alt="Selected"
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <label
-                                      htmlFor="file"
-                                      className="absolute inset-0 flex items-center justify-center"
-                                    >
-                                      <EditIcon style={{ fontSize: 40 }} />
-                                    </label>
-                                    <input
-                                      id="file"
-                                      type="file"
-                                      accept="image/*"
-                                      onChange={handleImageChange}
-                                      style={{ display: "none" }}
-                                    />
-                                  </div>
+                              </div>
+                            ) : (
+                              <div className="flex justify-center mb-8">
+                                <div className="bg-purple-200 w-40 h-52 flex items-center justify-center cursor-pointer relative">
+                                  <img
+                                    src={image}
+                                    alt="Selected"
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <label
+                                    htmlFor="file"
+                                    className="absolute inset-0 flex items-center justify-center"
+                                  >
+                                    <EditIcon style={{ fontSize: 40 }} />
+                                  </label>
+                                  <input
+                                    id="file"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    style={{ display: "none" }}
+                                  />
                                 </div>
-                              )}
-
-                              {/* Form fields */}
-                              <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                  คำนำหน้า
-                                </label>
-                                <select
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  value={prefix}
-                                  defaultValue={prefix}
-                                  onChange={(e) => setPrefix(e.target.value)}
-                                >
-                                  <option value="นาย">นาย</option>
-                                  <option value="นาง">นาง</option>
-                                  <option value="นางสาว">นางสาว</option>
-                                </select>
                               </div>
+                            )}
 
-                              <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                  ชื่อ
-                                </label>
-                                <input
-                                  ref={firstnameRef}
-                                  // defaultValue={firstnameRef.current!.value}
-                                  placeholder="ชื่อ"
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  required
-                                />
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                  นามสกุล
-                                </label>
-                                <input
-                                  ref={lastnameRef}
-                                  placeholder="นามสกุล"
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  required
-                                />
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                  ตำแหน่งงาน
-                                </label>
-                                <input
-                                  ref={positionRef}
-                                  placeholder="ตำแหน่ง"
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2">
-                                  วิทยฐานะ
-                                </label>
-                                <select
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  value={level}
-                                  onChange={(e) => setLevel(e.target.value)}
-                                >
-                                  <option value="ผู้ช่วย">ผู้ช่วย</option>
-                                  <option value="จิตอาสา">จิตอาสา</option>
-                                  <option value="ค.ศ 1">ค.ศ 1</option>
-                                  <option value="ชำนาญการ">ชำนาญการ</option>
-                                  <option value="ชำนาญการพิเศษ">
-                                    ชำนาญการพิเศษ
-                                  </option>
-                                  <option value="เชี่ยวชาญ">เชี่ยวชาญ</option>
-                                  <option value="เชียวชาญพิเศษ">
-                                    เชียวชาญพิเศษ
-                                  </option>
-                                </select>
-                              </div>
-
-                              {/* Save and close buttons */}
-                              <DialogActions>
-                                <Button onClick={handleClose}>ยกเลิก</Button>
-                                <Button autoFocus>บันทึกการแก้ไข</Button>
-                              </DialogActions>
+                            {/* Form fields */}
+                            <div className="mb-4">
+                              <label className="block text-gray-700 text-sm font-bold mb-2">
+                                คำนำหน้า
+                              </label>
+                              <select
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                value={prefix}
+                                defaultValue={prefix}
+                                onChange={(e) => setPrefix(e.target.value)}
+                              >
+                                <option value="นาย">นาย</option>
+                                <option value="นาง">นาง</option>
+                                <option value="นางสาว">นางสาว</option>
+                              </select>
                             </div>
+
+                            <div className="mb-4">
+                              <label className="block text-gray-700 text-sm font-bold mb-2">
+                                ชื่อ
+                              </label>
+                              <input
+                                // ref={firstnameRef}
+                                onChange={(e) =>
+                                  setFirstname(e.target.value)
+                                }
+                                value={firstname}
+                                placeholder="ชื่อ"
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                required
+                              />
+                            </div>
+
+                            <div className="mb-4">
+                              <label className="block text-gray-700 text-sm font-bold mb-2">
+                                นามสกุล
+                              </label>
+                              <input
+                                value={lastname}
+                                onChange={(e) =>
+                                  setLastname(e.target.value)
+                                }
+                                placeholder="นามสกุล"
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                required
+                              />
+                            </div>
+
+                            <div className="mb-4">
+                              <label className="block text-gray-700 text-sm font-bold mb-2">
+                                ตำแหน่งงาน
+                              </label>
+                              <input
+                                value={position}
+                                onChange={(e) =>
+                                  setPosition(e.target.value)
+                                }
+                                placeholder="ตำแหน่ง"
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              />
+                            </div>
+
+                            <div className="mb-4">
+                              <label className="block text-gray-700 text-sm font-bold mb-2">
+                                วิทยฐานะ
+                              </label>
+                              <select
+                                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                value={level}
+                                onChange={(e) => setLevel(e.target.value)}
+                              >
+                                <option value="ผู้ช่วย">ผู้ช่วย</option>
+                                <option value="จิตอาสา">จิตอาสา</option>
+                                <option value="ค.ศ 1">ค.ศ 1</option>
+                                <option value="ชำนาญการ">ชำนาญการ</option>
+                                <option value="ชำนาญการพิเศษ">
+                                  ชำนาญการพิเศษ
+                                </option>
+                                <option value="เชี่ยวชาญ">เชี่ยวชาญ</option>
+                                <option value="เชียวชาญพิเศษ">
+                                  เชียวชาญพิเศษ
+                                </option>
+                              </select>
+                            </div>
+                            <div className="mb-4">
+                              <label className="block text-gray-700 text-sm font-bold mb-2">
+                                แผนก
+                              </label>
+                              <div className="relative">
+                                <select
+                                  value={departmentName}
+                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  onChange={(e) =>
+                                    setDepartment(e.target.value)
+                                  }
+                                >
+                                  {department.current.map((dept, index) => (
+                                    <option key={index} value={dept.name}>
+                                      {dept.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                            {/* Save and close buttons */}
+                            <DialogActions>
+                              <Button onClick={handleClose}>ยกเลิก</Button>
+                              <Button autoFocus>บันทึกการแก้ไข</Button>
+                            </DialogActions>
                           </div>
                         )}
                       </Dialog>

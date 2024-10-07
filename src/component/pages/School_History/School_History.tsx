@@ -27,7 +27,7 @@ const SchoolHistory = () => {
     address: "",
     school_emblem_img: "",
   });
-  const [imageFile, setImageFile] = useState<File | null>(null); 
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -59,7 +59,7 @@ const SchoolHistory = () => {
           goals: [docData.goal_1, docData.goal_2, docData.goal_3],
           founding_date: docData.founding_date,
           address: docData.address,
-          school_emblem_img: docData.school_emblem_img, 
+          school_emblem_img: docData.school_emblem_img,
         });
       }
       setLoading(false);
@@ -74,7 +74,7 @@ const SchoolHistory = () => {
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUpdatedFields((prev) => ({ ...prev, school_emblem_img: reader.result as string })); 
+        setUpdatedFields((prev) => ({ ...prev, school_emblem_img: reader.result as string }));
       };
       reader.readAsDataURL(file);
     }
@@ -97,7 +97,10 @@ const SchoolHistory = () => {
             await deleteObject(oldImageRef);
           }
 
-          const imageRef = ref(storage, `school_emblems/${imageFile.name}`);
+          const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+          const fileNameWithDate = `${timestamp}_${imageFile.name}`;
+
+          const imageRef = ref(storage, `school_emblems/${fileNameWithDate}`);
           await uploadBytes(imageRef, imageFile);
 
           imageUrl = await getDownloadURL(imageRef);

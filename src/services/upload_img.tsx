@@ -4,7 +4,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { db, storage } from "../firebase";
 
 interface UploadImageProps {
-    onSuccess: () => void; 
+    onSuccess: () => void;
 }
 
 const UploadImage: React.FC<UploadImageProps> = ({ onSuccess }) => {
@@ -23,7 +23,10 @@ const UploadImage: React.FC<UploadImageProps> = ({ onSuccess }) => {
         if (!imageFile) return;
         setUploading(true);
         try {
-            const storageRef = ref(storage, `banners/${imageFile.name}`);
+            const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+            const fileNameWithDate = `${timestamp}_${imageFile.name}`;
+
+            const storageRef = ref(storage, `banners/${fileNameWithDate}`);
             await uploadBytes(storageRef, imageFile);
             const url = await getDownloadURL(storageRef);
 
@@ -31,7 +34,6 @@ const UploadImage: React.FC<UploadImageProps> = ({ onSuccess }) => {
             setImageUrl(url);
             alert("อัปโหลดรูปภาพสำเร็จ!");
 
-            // เรียกใช้ onSuccess เพื่อโหลดข้อมูลรูปภาพใหม่
             if (onSuccess) {
                 onSuccess();
             }

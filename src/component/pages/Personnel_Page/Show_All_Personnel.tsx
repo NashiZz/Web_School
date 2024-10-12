@@ -103,11 +103,12 @@ const ShowAllPersonnel = () => {
       console.log("Document successfully deleted!");
       const oldImageRef = ref(storage, person?.img);
       await deleteObject(oldImageRef);
-      window.location.reload();
     } catch (error) {
       console.error("Error removing document: ", error);
     }
     setOpenDel(false);
+    loadDataPersonnel();
+    window.location.reload();
   };
   const handleSubmit = async () => {
     if (!activePersonId) {
@@ -145,6 +146,8 @@ const ShowAllPersonnel = () => {
     } finally {
       setLoading(false);
       setOpen(false);
+      window.location.reload();
+      loadDataPersonnel();
     }
   };
 
@@ -172,31 +175,30 @@ const ShowAllPersonnel = () => {
     setOpen(false);
     setActivePersonId("");
   };
+  const loadDataPersonnel = async () => {
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      const personnelData = await getDocs(
+        query(personnelRef, orderBy("pid", "asc"))
+      );
+
+      const getPersonnel = personnelData.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      })) as PersonnelModel[];
+      console.log(getPersonnel);
+
+      // totalPages.current = Math.ceil(getPersonnel.length / 10)
+      dispatch({ type: "SET_PERSONNEL", payload: getPersonnel });
+    } catch (error) {
+      console.error("Error fetching personnel data: ", error);
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  };
 
   useEffect(() => {
-    const loadDataPersonnel = async () => {
-      try {
-        dispatch({ type: "SET_LOADING", payload: true });
-
-        const personnelData = await getDocs(
-          query(personnelRef, orderBy("pid", "asc"))
-        );
-
-        const getPersonnel = personnelData.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        })) as PersonnelModel[];
-        console.log(getPersonnel);
-
-        // totalPages.current = Math.ceil(getPersonnel.length / 10)
-        dispatch({ type: "SET_PERSONNEL", payload: getPersonnel });
-      } catch (error) {
-        console.error("Error fetching personnel data: ", error);
-      } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
-      }
-    };
-
     loadDataPersonnel();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

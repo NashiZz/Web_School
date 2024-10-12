@@ -17,7 +17,10 @@ interface Action {
   payload?: any;
 }
 
-const personnelReducer = (state: PersonnelState, action: Action): PersonnelState => {
+const personnelReducer = (
+  state: PersonnelState,
+  action: Action
+): PersonnelState => {
   switch (action.type) {
     case "SET_PERSONNEL":
       return { ...state, personnel: action.payload, loading: false };
@@ -32,7 +35,10 @@ const PersonnelPage = () => {
   const { departmentName } = useParams<{ departmentName: string }>();
   const personnelRef = collection(db, "personnel");
 
-  const [state, dispatch] = useReducer(personnelReducer, { personnel: [], loading: true });
+  const [state, dispatch] = useReducer(personnelReducer, {
+    personnel: [],
+    loading: true,
+  });
 
   useEffect(() => {
     const loadData = async () => {
@@ -62,7 +68,7 @@ const PersonnelPage = () => {
 
     loadData();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departmentName]);
 
   return (
@@ -84,31 +90,63 @@ const PersonnelPage = () => {
               </h1>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:px-40 xl:pr-40 lg:px-30 lg:pr-30 md:px-20 md:pr-20 sm:px-20 sm:pr-20 px-10 pr-10 pt-10 pb-10">
-            {state.personnel.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden w-64 max-w-xs mx-auto"
-              >
-                <img
-                  src={item.img}
-                  alt={`${item.firstname} ${item.lastname}`}
-                  className="w-full h-80 object-cover mx-auto"
-                />
-                <div className="p-2 flex flex-col justify-center items-center">
-                  <h4 className="text-md font-bold mb-2 text-center">
-                    {`${item.prefix} ${item.firstname} ${item.lastname}`}
-                  </h4>
-                  <h4 className="text-sm text-gray-700 text-center">
-                    {item.position}
-                  </h4>
-                  <h4 className="text-sm text-gray-400 text-center">
-                    {item.level != undefined ? `ครู${item.level}` : ""}
-                  </h4>
+          <div className="flex items-center justify-center mt-5">
+            {state.personnel
+              .filter((item) => item.isLeader == true)
+              .map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden w-64 max-w-xs mx-auto"
+                >
+                  <img
+                    src={item.img}
+                    alt={`${item.firstname} ${item.lastname}`}
+                    className="w-full h-80 object-cover mx-auto"
+                  />
+                  <div className="p-2 flex flex-col justify-center items-center">
+                    <h4 className="text-md font-bold mb-2 text-center">
+                      {`${item.prefix} ${item.firstname} ${item.lastname}`}
+                    </h4>
+                    <h4 className="text-sm text-gray-700 text-center">
+                      {item.position}
+                    </h4>
+                    <h4 className="text-sm text-gray-400 text-center">
+                      {item.level !== "ไม่มี" && item.department == "คณะผู้บริหารโรงเรียน" ? `${item.level}` : item.level == "ไม่มี" ? "" : `ครู${item.level}` }
+                    </h4>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+          </div>
+
+          <div
+            className="grid place-items-center grid-cols-[repeat(auto-fit,_16.666666%)] m-auto
+  justify-center gap-8  pt-10 pb-10"
+          >
+            {state.personnel
+              .filter((item) => item.isLeader !== true)
+              .map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white justify-center rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden w-64 max-w-xs mx-auto"
+                >
+                  <img
+                    src={item.img}
+                    alt={`${item.firstname} ${item.lastname}`}
+                    className="w-full h-80 object-cover mx-auto"
+                  />
+                  <div className="p-2 flex flex-col justify-center items-center">
+                    <h4 className="text-md font-bold mb-2 text-center">
+                      {`${item.prefix} ${item.firstname} ${item.lastname}`}
+                    </h4>
+                    <h4 className="text-sm text-gray-700 text-center">
+                      {item.position}
+                    </h4>
+                    <h4 className="text-sm text-gray-400 text-center">
+                    {item.level !== "ไม่มี" && item.department == "คณะผู้บริหารโรงเรียน" ? `${item.level}` : item.level == "ไม่มี" ? "" : `ครู${item.level}` }
+                    </h4>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       )}

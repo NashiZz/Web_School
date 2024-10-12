@@ -68,6 +68,16 @@ const AddPersonalPage = () => {
         console.log(error);
       } finally {
         console.log("getDepartment");
+        // รีเซ็ตฟอร์มหลังจากบันทึกข้อมูล
+        firstnameRef.current!.value = "";
+        lastnameRef.current!.value = "";
+        positionRef.current!.value = "";
+        if(isChecked != false){
+          setIsChecked(false);
+        }
+
+        setImage(null);
+        setImageFile(null);
         setLoading(false);
       }
     });
@@ -280,6 +290,7 @@ const AddPersonalPage = () => {
                   type="checkbox"
                   checked={isChecked}
                   onChange={handleCheckboxChange}
+                  required
                 />
                 <span className="ml-2 bg-blend-color-dodge text-md">
                   เป็นหัวหน้าหรือไม่ {isChecked ? "เป็น" : "ไม่เป็น"}

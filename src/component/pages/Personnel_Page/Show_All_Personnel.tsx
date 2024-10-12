@@ -107,8 +107,9 @@ const ShowAllPersonnel = () => {
       console.error("Error removing document: ", error);
     }
     setOpenDel(false);
-    loadDataPersonnel();
     window.location.reload();
+    loadDataPersonnel();
+    
   };
   const handleSubmit = async () => {
     if (!activePersonId) {

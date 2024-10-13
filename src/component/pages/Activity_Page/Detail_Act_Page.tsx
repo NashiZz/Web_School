@@ -1,9 +1,8 @@
 
-import banner from "../../../assets/banner1.jpg";
-import { useParams, useLocation } from 'react-router-dom';
+import {  useLocation } from 'react-router-dom';
 
 const DetailAct_Page = () => {
-  const { id } = useParams();  // ดึง id จาก URL
+//   const { id } = useParams();  // ดึง id จาก URL
   const location = useLocation();  // ดึง state ที่ส่งมาผ่าน Link
   const { item } = location.state || {};  
   console.log(item);

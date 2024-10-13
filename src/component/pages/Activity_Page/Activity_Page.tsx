@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect , useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import { styled } from "@mui/material/styles";
@@ -93,25 +93,25 @@ const ActivityPage = () => {
     }
     setIsOpen(false);
   };
-  const uploadImage = async (file: File) => {
-    try {
-      let storageRef: any = "";
-      if (activity === "กิจกรรม") {
-        storageRef = ref(storage, `activitys/${file.name}`);
-      } else if (activity === "ผลงาน") {
-        storageRef = ref(storage, `works/${file.name}`);
-      } else if (activity === "ข่าวสาร") {
-        storageRef = ref(storage, `ข่าวสาร/${file.name}`);
-      }
+  // const uploadImage = async (file: File) => {
+  //   try {
+  //     let storageRef: any = "";
+  //     if (activity === "กิจกรรม") {
+  //       storageRef = ref(storage, `activitys/${file.name}`);
+  //     } else if (activity === "ผลงาน") {
+  //       storageRef = ref(storage, `works/${file.name}`);
+  //     } else if (activity === "ข่าวสาร") {
+  //       storageRef = ref(storage, `ข่าวสาร/${file.name}`);
+  //     }
 
-      await uploadBytes(storageRef, file);
-      const imageURL = await getDownloadURL(storageRef);
-      return imageURL;
-    } catch (error) {
-      console.error("Error uploading image: ", error);
-      return null;
-    }
-  };
+  //     await uploadBytes(storageRef, file);
+  //     const imageURL = await getDownloadURL(storageRef);
+  //     return imageURL;
+  //   } catch (error) {
+  //     console.error("Error uploading image: ", error);
+  //     return null;
+  //   }
+  // };
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {

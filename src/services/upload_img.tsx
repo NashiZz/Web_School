@@ -10,7 +10,7 @@ interface UploadImageProps {
 const UploadImage: React.FC<UploadImageProps> = ({ onSuccess }) => {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
-    const [imageUrl, setImageUrl] = useState("");
+    // const [imageUrl, setImageUrl] = useState("");
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -31,7 +31,7 @@ const UploadImage: React.FC<UploadImageProps> = ({ onSuccess }) => {
             const url = await getDownloadURL(storageRef);
 
             await addDoc(collection(db, "banners_school"), { imageUrl: url });
-            setImageUrl(url);
+            // setImageUrl(url);
             alert("อัปโหลดรูปภาพสำเร็จ!");
 
             if (onSuccess) {

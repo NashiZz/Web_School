@@ -36,7 +36,7 @@ function Header() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null); // เก็บข้อมูลผู้ใช้
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
+  // const [isAdmin, setIsAdmin] = useState(false);
 
   const checkAdminStatus = async (uid: string) => {
     const querySnapshot = await getDocs(
@@ -47,7 +47,7 @@ function Header() {
       querySnapshot.forEach((doc) => {
         const userData = doc.data();
         if (userData.role === "admin") {
-          setIsAdmin(true);
+          // setIsAdmin(true);
         } else {
           navigate("/");
         }

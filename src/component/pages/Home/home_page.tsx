@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 import { db, storage, auth } from "../../../firebase";
 import banner1 from "../../../assets/banner1.jpg";
 import banner2 from "../../../assets/banner3.jpg";
@@ -18,6 +27,7 @@ import UploadImage from "../../../services/upload_img";
 import Modal from "../../../services/modal";
 import { deleteObject, ref } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
+import { activityModel } from "../../../model/activitys";
 
 const Home = () => {
   const [banners, setBanners] = useState<string[]>([]);
@@ -25,19 +35,23 @@ const Home = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [sortedBanners, setSortedBanners] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [dataActivitys, setDataActivitys] = useState<activityModel[]>([]);
+  const [dataNews, setDataNews] = useState<activityModel[]>([]);
+  const [dataWorks, setDataWorks] = useState<activityModel[]>([]);
+
   const navigate = useNavigate();
 
   const checkAdminStatus = async (uid: string) => {
-    const querySnapshot = await getDocs(query(collection(db, "admin"), where("uid", "==", uid)));
+    const querySnapshot = await getDocs(
+      query(collection(db, "admin"), where("uid", "==", uid))
+    );
 
     if (!querySnapshot.empty) {
       querySnapshot.forEach((doc) => {
         const userData = doc.data();
         if (userData.role === "admin") {
           setIsAdmin(true);
-          
         } else {
-          
           navigate("/");
         }
       });
@@ -49,10 +63,10 @@ const Home = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        localStorage.setItem('isAdmin',"true");
+        localStorage.setItem("isAdmin", "true");
         checkAdminStatus(user.uid);
       } else {
-        localStorage.setItem('isAdmin',"false");
+        localStorage.setItem("isAdmin", "false");
         navigate("/");
       }
     });
@@ -84,9 +98,40 @@ const Home = () => {
     setBanners(bannerUrls);
     setSortedBanners(bannerUrls);
   };
+  const fetchDataActivity = async () => {
+    const activitySnapshot = await getDocs(
+      query(
+        collection(db, "activitys"),
+        orderBy("date_activity", "desc"),
+        limit(4)
+      )
+    );
+    const activity = activitySnapshot.docs.map((doc) =>
+      doc.data()
+    ) as activityModel[];
+    setDataActivitys(activity);
+
+    const newSnapshot = await getDocs(
+      query(collection(db, "news"), orderBy("date_activity", "desc"), limit(4))
+    );
+    const newdata = newSnapshot.docs.map((doc) =>
+      doc.data()
+    ) as activityModel[];
+    setDataNews(newdata);
+
+    const workSnapshot = await getDocs(
+      query(collection(db, "works"), orderBy("date_activity", "desc"), limit(6))
+    );
+    const work = workSnapshot.docs.map((doc) => doc.data()) as activityModel[];
+    setDataWorks(work);
+
+    // setBanners(bannerUrls);
+    // setSortedBanners(bannerUrls);
+  };
 
   useEffect(() => {
     fetchBanners();
+    fetchDataActivity();
   }, []);
 
   useEffect(() => {
@@ -100,7 +145,9 @@ const Home = () => {
       const storageRef = ref(storage, storagePath);
 
       const bannerDocRef = await getDocs(collection(db, "banners_school"));
-      const bannerToDelete = bannerDocRef.docs.find(doc => doc.data().imageUrl === bannerUrl);
+      const bannerToDelete = bannerDocRef.docs.find(
+        (doc) => doc.data().imageUrl === bannerUrl
+      );
       if (bannerToDelete) {
         await deleteDoc(doc(db, "banners_school", bannerToDelete.id));
       }
@@ -153,7 +200,9 @@ const Home = () => {
       {isAdmin && (
         <>
           <div className="mt-5 text-center">
-            <h2 className="text-lg font-semibold mb-2">เพิ่มรูปภาพ Banner ใหม่</h2>
+            <h2 className="text-lg font-semibold mb-2">
+              เพิ่มรูปภาพ Banner ใหม่
+            </h2>
             <UploadImage onSuccess={handleUploadSuccess} />
             <button
               onClick={() => setModalIsOpen(true)}
@@ -163,12 +212,19 @@ const Home = () => {
               ดูรูปภาพที่มีอยู่
             </button>
 
-            <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={() => setModalIsOpen(false)}
+            >
               <h2 className="text-lg font-semibold mb-2">รูปภาพที่มีอยู่</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortedBanners.map((banner, index) => (
                   <div key={index} className="relative">
-                    <img src={banner} alt={`Banner ${index}`} className="w-full h-[200px] object-cover" />
+                    <img
+                      src={banner}
+                      alt={`Banner ${index}`}
+                      className="w-full h-[200px] object-cover"
+                    />
                     <button
                       onClick={() => deleteBanner(banner)}
                       className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 shadow-md hover:bg-red-500 transition-colors duration-300"
@@ -249,117 +305,36 @@ const Home = () => {
           <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner1}
-              alt="News Image 1"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                การปรับแก้ไขคะแนนความประพฤติ
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 1 สิงหาคม 2566...
-              </p>
-              <Link to="/news/1" className="text-red-600 hover:underline">
-                Read more
-              </Link>
+          {dataNews.map((item) => (
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={item.img}
+                alt="News Image 1"
+                className="w-full h-48 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {item.date_activity
+                    ? `วันที่ ${item.date_activity
+                        .toDate()
+                        .toLocaleDateString("th-TH")}`
+                    : "ไม่ระบุวันที่"}
+                </p>
+                <Link
+                  to={`/activity/${item.id}`}
+                  state={{ item }}
+                  className="text-red-600 hover:underline"
+                >
+                  Read more
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 2"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 3"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 4"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 5"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 6"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
+          ))}
         </div>
         <div className="relative container mx-auto py-8 ">
           <button
+            onClick={() => navigate(`/show_activity/ข่าวสาร`)}
             type="button"
             className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
           >
@@ -378,49 +353,87 @@ const Home = () => {
           <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner1}
-              alt="News Image 1"
-              className="w-full h-80 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                การปรับแก้ไขคะแนนความประพฤติ
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 1 สิงหาคม 2566...
-              </p>
-              <Link to="/news/1" className="text-red-600 hover:underline">
-                Read more
-              </Link>
+          {dataActivitys.map((item) => (
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={item.img}
+                alt="News Image 1"
+                className="w-full h-80 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {item.date_activity
+                    ? `วันที่ ${item.date_activity
+                        .toDate()
+                        .toLocaleDateString("th-TH")}`
+                    : "ไม่ระบุวันที่"}
+                </p>
+                <Link
+                  to={`/activity/${item.id}`}
+                  state={{ item }}
+                  className="text-red-600 hover:underline"
+                >
+                  Read more
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 2"
-              className="w-full h-80 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
+          ))}
         </div>
         <div className="relative container mx-auto py-8 ">
           <button
             type="button"
+            onClick={() => navigate(`/show_activity/กิจกรรม`)}
             className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
           >
-            ข่าวสารทั้งหมด
+            กิจกรรมทั้งหมด
+          </button>
+          <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
+        </div>
+      </div>
+      <div className="container mx-auto  ">
+        <div className="relative container mx-auto py-8">
+          <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
+            ผลงาน
+            <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
+          </h2>
+          <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          {dataWorks.map((item) => (
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={item.img}
+                alt="News Image 1"
+                className="w-full h-80 object-cover"
+              />
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {item.date_activity
+                    ? `วันที่ ${item.date_activity
+                        .toDate()
+                        .toLocaleDateString("th-TH")}`
+                    : "ไม่ระบุวันที่"}
+                </p>
+                <Link
+                  to={`/activity/${item.id}`}
+                  state={{ item }}
+                  className="text-red-600 hover:underline"
+                >
+                  Read more
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="relative container mx-auto py-8 ">
+          <button
+            type="button"
+            onClick={() => navigate(`/show_activity/ผลงาน`)}
+            className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+          >
+            ผลงานทั้งหมด
           </button>
           <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
         </div>
@@ -458,6 +471,6 @@ const Home = () => {
       </div>
     </>
   );
-}
+};
 
 export default Home;

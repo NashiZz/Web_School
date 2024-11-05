@@ -98,6 +98,7 @@ function Header() {
       await signOut(auth);
       setUser(null);
       localStorage.setItem("isAdmin", "false");
+      alert("ออกจากระบบสำเร็จ");
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -151,18 +152,16 @@ function Header() {
         </div>
       ) : (
         <header
-          className={`bg-header shadow-md sticky top-0 z-50 transition-all duration-300 ${
-            isScrolled ? "py-1" : "py-2"
-          }`}
+          className={`bg-header shadow-md sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-1" : "py-2"
+            }`}
         >
           <div className="container mx-auto px-4 flex flex-wrap items-center justify-between relative">
             <div className="flex items-center w-full md:w-auto">
               <img
                 src={Logo}
                 alt="Logo"
-                className={`mr-3 transition-all duration-300 my-3 ${
-                  isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
-                } object-contain`}
+                className={`mr-3 transition-all duration-300 my-3 ${isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
+                  } object-contain`}
                 style={{ maxWidth: "100px" }}
               />
 
@@ -185,9 +184,8 @@ function Header() {
               <img
                 src={Logo2}
                 alt="Logo2"
-                className={`ml-3 transition-all duration-300 my-3 ${
-                  isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
-                } object-contain`}
+                className={`ml-3 transition-all duration-300 my-3 ${isScrolled ? "h-8 md:h-10" : "h-12 md:h-16"
+                  } object-contain`}
                 style={{ maxWidth: "100px" }}
               />
             </div>
@@ -203,11 +201,9 @@ function Header() {
             </button>
 
             <nav
-              className={`md:flex ${
-                isScrolled ? "md:space-x-4" : "md:space-x-6"
-              } ${
-                isMobileMenuOpen ? "block" : "hidden"
-              } w-full md:w-auto transition-all duration-300`}
+              className={`md:flex ${isScrolled ? "md:space-x-4" : "md:space-x-6"
+                } ${isMobileMenuOpen ? "block" : "hidden"
+                } w-full md:w-auto transition-all duration-300`}
             >
               <Link
                 to="/"
@@ -215,28 +211,12 @@ function Header() {
               >
                 หน้าแรก
               </Link>
-              {/* <div
-                className="relative"
-                onMouseEnter={() => handleDropdownMouseEnter("about")}
-              >
-                <button className="block text-gray-700 hover:text-white py-2 items-center">
-                  เกี่ยวกับโรงเรียน
-                  <FontAwesomeIcon icon={faChevronDown} className="ml-2" />
-                </button> */}
-              {/* {dropdownOpen === "about" && (
-                  <div
-                    className="absolute left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg w-48 z-20"
-                    onMouseLeave={handleDropdownMouseLeave}
-                  > */}
               <Link
                 to="/school_history"
                 className="block text-gray-700 hover:text-white py-2"
               >
                 ประวัติโรงเรียน
               </Link>
-              {/* </div> */}
-              {/* )} */}
-              {/* </div> */}
               {localStorage.getItem("isAdmin") == "true" ? (
                 <div
                   className="relative"

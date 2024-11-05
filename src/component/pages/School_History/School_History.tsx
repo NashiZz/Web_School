@@ -4,7 +4,7 @@ import { db } from "../../../firebase";
 import { collection, doc, getDocs, onSnapshot, query, updateDoc, where } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { InformationSchoolModel } from "../../../model/information_school";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Snackbar } from '@mui/material';
 import { getAuth } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 
@@ -29,8 +29,7 @@ const SchoolHistory = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [saveError, setSaveError] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -82,8 +81,6 @@ const SchoolHistory = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    setSaveSuccess(false);
-    setSaveError(false);
 
     if (infor.current) {
       const docRef = doc(db, "information_school", infor.current.id);
@@ -123,11 +120,10 @@ const SchoolHistory = () => {
           school_emblem_img: imageUrl,
         });
 
-        setSaveSuccess(true);
         setEditing(false);
+        setOpenSnackbar(true);
       } catch (error) {
         console.error("Error saving data:", error);
-        setSaveError(true);
       } finally {
         setSaving(false);
       }
@@ -172,6 +168,8 @@ const SchoolHistory = () => {
       setUpdatedFields((prev) => ({ ...prev, [field]: value }));
     }
   };
+
+  const handleCloseSnackbar = () => setOpenSnackbar(false);
 
   return (
     <>
@@ -245,8 +243,6 @@ const SchoolHistory = () => {
                         <button onClick={handleCancel} className="bg-red-500 text-white px-4 py-2 rounded-md ml-4">
                           ยกเลิก
                         </button>
-                        {saveSuccess && <p className="text-green-500 mt-4">บันทึกข้อมูลเรียบร้อยแล้ว</p>}
-                        {saveError && <p className="text-red-500 mt-4">บันทึกข้อมูลไม่สำเร็จ</p>}
                       </>
                     ) : (
                       <>
@@ -283,11 +279,13 @@ const SchoolHistory = () => {
                           <input type="file" accept="image/*" onChange={handleImageChange} />
                         </div>
                         {updatedFields.school_emblem_img && (
-                          <img
-                            src={updatedFields.school_emblem_img}
-                            alt="ตราโรงเรียน"
-                            className="h-35 mb-4"
-                          />
+                          <div className="flex items-center justify-center mb-6">
+                            <img
+                              src={updatedFields.school_emblem_img}
+                              alt="ตราโรงเรียน"
+                              className="h-35 mb-4"
+                            />
+                          </div>
                         )}
                         <textarea
                           className="w-full p-2 border rounded-md mb-4"
@@ -353,6 +351,12 @@ const SchoolHistory = () => {
               </div>
             </div>
           </div>
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={handleCloseSnackbar}
+            message="บันทึกข้อมูลสำเร็จ!"
+          />
         </div>
       )}
     </>

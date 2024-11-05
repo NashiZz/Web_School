@@ -13,6 +13,8 @@ import {
   doc,
   orderBy,
   updateDoc,
+  QueryDocumentSnapshot, 
+  DocumentData,
 } from "firebase/firestore";
 import { activityModel } from "../../../model/activitys";
 import { CircularProgress } from "@mui/material";
@@ -32,7 +34,7 @@ const ActivityPage = () => {
   const [data, setData] = useState<activityModel[]>([]); // ใช้ state เดียวสำหรับจัดการทั้ง activitys และ works
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastVisible, setLastVisible] = useState<any>(null); // เก็บ reference ของ document ล่าสุดที่ถูกดึง
+  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);// เก็บ reference ของ document ล่าสุดที่ถูกดึง
   const [totalPages, setTotalPages] = useState(0); // จำนวนหน้าทั้งหมด
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
@@ -71,8 +73,10 @@ const ActivityPage = () => {
       })) as activityModel[];
 
       setLastVisible(snapshot.docs[snapshot.docs.length - 1]); // เก็บ document ล่าสุด
+     console.log(JSON.stringify(lastVisible));
+     
       setData(list);
-      console.log(q);
+      
     } catch (error) {
       console.error("Error fetching data: ", error);
     } finally {
@@ -155,7 +159,7 @@ const ActivityPage = () => {
         }
 
 
-        let storageRef: any = "";
+        let storageRef: String = "";
         if (activity === "กิจกรรม") {
           storageRef = 'activitys';
         } else if (activity === "ผลงาน") {
@@ -168,7 +172,7 @@ const ActivityPage = () => {
         await uploadBytes(imageRef, imageFile);
 
         imageUrl = await getDownloadURL(imageRef);
-        console.log(imageRef);
+        
       }
       
       
@@ -217,14 +221,25 @@ const ActivityPage = () => {
   };
 
   useEffect(() => {
-    if (activity === "กิจกรรม") {
-      fetchData("activitys", currentPage);
-    } else if (activity === "ผลงาน") {
-      fetchData("works", currentPage);
-    } else if (activity === "ข่าวสาร") {
-      fetchData("news", currentPage);
+    // รีเซ็ต currentPage เป็น 1 เมื่อ activity เปลี่ยน
+    setCurrentPage(1);
+}, [activity]); // เมื่อ activity เปลี่ยน currentPage จะถูกตั้งเป็น 1
+
+useEffect(() => {
+    switch (activity) {
+      case "กิจกรรม":
+        fetchData("activitys", currentPage);
+        break;
+      case "ผลงาน":
+        fetchData("works", currentPage);
+        break;
+      case "ข่าวสาร":
+        fetchData("news", currentPage);
+        break;
+      default:
+        console.error("ไม่พบประเภท activity ที่ระบุ");
     }
-  }, [activity, currentPage]); // โหลดข้อมูลใหม่เมื่อ activity หรือ page เปลี่ยน
+}, [activity, currentPage]); // โหลดข้อมูลใหม่เมื่อ activity หรือ page เปลี่ยน
 
   const StyledPagination = styled(Pagination)({
     "& .MuiPaginationItem-page.Mui-selected": {

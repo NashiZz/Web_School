@@ -73,7 +73,6 @@ const ActivityPage = () => {
       })) as activityModel[];
 
       setLastVisible(snapshot.docs[snapshot.docs.length - 1]); // เก็บ document ล่าสุด
-     console.log(JSON.stringify(lastVisible));
      
       setData(list);
       
@@ -88,7 +87,6 @@ const ActivityPage = () => {
     try {
       await deleteDoc(doc(db, collectionName, id));
       setData((prevData) => prevData.filter((item) => item.id !== id));
-      console.log("Document successfully deleted!");
       const oldImageRef = ref(storage,selected?.img);
       await deleteObject(oldImageRef);
       window.location.reload();
@@ -159,7 +157,7 @@ const ActivityPage = () => {
         }
 
 
-        let storageRef: String = "";
+        let storageRef = "";
         if (activity === "กิจกรรม") {
           storageRef = 'activitys';
         } else if (activity === "ผลงาน") {
@@ -191,7 +189,6 @@ const ActivityPage = () => {
       setSelectedItem(null);
       setIsOpenEdit(false);
       fetchData(collectionName, currentPage);
-      console.log("Document successfully updated!");
     } catch (error) {
       console.error("Error updating document: ", error);
     }

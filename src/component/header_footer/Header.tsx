@@ -34,6 +34,7 @@ function Header() {
   const department = useRef<departmentModel[]>([]);
   const ActivitiesoOrWorks = ["กิจกรรม", "ผลงาน", "ข่าวสาร"];
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null); // เก็บข้อมูลผู้ใช้
   const navigate = useNavigate();
   // const [isAdmin, setIsAdmin] = useState(false);
@@ -121,7 +122,6 @@ function Header() {
       } catch (error) {
         console.log(error);
       } finally {
-        console.log("getDepartment");
         setLoading(false);
       }
     });

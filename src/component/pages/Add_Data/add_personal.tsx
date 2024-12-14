@@ -72,7 +72,7 @@ const AddPersonalPage = () => {
         firstnameRef.current!.value = "";
         lastnameRef.current!.value = "";
         positionRef.current!.value = "";
-        if(isChecked != false){
+        if (isChecked != false) {
           setIsChecked(false);
         }
 
@@ -284,15 +284,14 @@ const AddPersonalPage = () => {
                 </select>
               </div>
             </div>
-            <div>
+            <div className="mb-4">
               <label>
                 <input
                   type="checkbox"
                   checked={isChecked}
                   onChange={handleCheckboxChange}
-                  required
                 />
-                <span className="ml-2 bg-blend-color-dodge text-md">
+                <span style={{ marginLeft: "8px" }}>
                   เป็นหัวหน้าหรือไม่ {isChecked ? "เป็น" : "ไม่เป็น"}
                 </span>
               </label>

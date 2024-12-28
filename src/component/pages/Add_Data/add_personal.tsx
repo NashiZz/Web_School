@@ -52,6 +52,8 @@ const AddPersonalPage = () => {
   };
 
   useEffect(() => {
+    console.log("useEffect");
+    
     const loadData = onSnapshot(departmentRef, async (snapshot) => {
       try {
         if (!snapshot.empty) {
@@ -76,13 +78,14 @@ const AddPersonalPage = () => {
           setIsChecked(false);
         }
 
+
         setImage(null);
         setImageFile(null);
         setLoading(false);
       }
     });
     return () => loadData();
-  }, [departmentRef]);
+  }, []);
 
   useEffect(() => {
     const loadData = onSnapshot(personnelRef, async (snapshot) => {

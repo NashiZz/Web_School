@@ -10,24 +10,21 @@ import {
   limit,
 } from "firebase/firestore";
 import { db, storage, auth } from "../../../firebase";
-import banner1 from "../../../assets/banner1.jpg";
-import banner2 from "../../../assets/banner3.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUserGraduate,
-  faSchool,
-  faChalkboardTeacher,
   faChevronLeft,
   faChevronRight,
   faEye,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import UploadImage from "../../../services/upload_img";
 import Modal from "../../../services/modal";
 import { deleteObject, ref } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
 import { activityModel } from "../../../model/activitys";
+import { CircularProgress } from "@mui/material";
+import GridContainer from "./components/GridContainer";
 
 const Home = () => {
   const [banners, setBanners] = useState<string[]>([]);
@@ -37,7 +34,8 @@ const Home = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [dataActivitys, setDataActivitys] = useState<activityModel[]>([]);
   const [dataNews, setDataNews] = useState<activityModel[]>([]);
-  const [dataWorks, setDataWorks] = useState<activityModel[]>([]);
+  const [dataContributions, setDataContributions] = useState<activityModel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -123,15 +121,24 @@ const Home = () => {
       query(collection(db, "works"), orderBy("date_activity", "desc"), limit(6))
     );
     const work = workSnapshot.docs.map((doc) => doc.data()) as activityModel[];
-    setDataWorks(work);
+    setDataContributions(work);
 
     // setBanners(bannerUrls);
     // setSortedBanners(bannerUrls);
   };
 
   useEffect(() => {
-    fetchBanners();
-    fetchDataActivity();
+    const loadData = async () => {
+      try {
+        await fetchBanners();
+        await fetchDataActivity();
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -167,308 +174,224 @@ const Home = () => {
 
   return (
     <>
-      <div className="relative overflow-hidden bg-gray-900">
-        <div
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {sortedBanners.map((banner, index) => (
-            <img
-              key={index}
-              src={banner}
-              alt={`Banner ${index}`}
-              className="w-full h-[400px] object-cover flex-shrink-0 md:h-[600px] lg:h-[650px]"
-            />
-          ))}
+      {isLoading ? (
+        <div className="h-screen flex justify-center items-center">
+          <CircularProgress />
         </div>
-
-        <button
-          onClick={goToPrevious}
-          className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-teal-700 text-white rounded-md p-3 shadow-md hover:bg-teal-600 transition-colors duration-300 z-10 opacity-75 hover:opacity-100"
-        >
-          <FontAwesomeIcon icon={faChevronLeft} className="h-6 w-6" />
-        </button>
-
-        <button
-          onClick={goToNext}
-          className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-teal-700 text-white rounded-md p-3 shadow-md hover:bg-teal-600 transition-colors duration-300 z-10 opacity-75 hover:opacity-100"
-        >
-          <FontAwesomeIcon icon={faChevronRight} className="h-6 w-6" />
-        </button>
-      </div>
-
-      {isAdmin && (
-        <>
-          <div className="mt-5 text-center">
-            <h2 className="text-lg font-semibold mb-2">
-              เพิ่มรูปภาพ Banner ใหม่
-            </h2>
-            <UploadImage onSuccess={handleUploadSuccess} />
-            <button
-              onClick={() => setModalIsOpen(true)}
-              className="mt-4 bg-teal-700 text-white rounded-md p-2 shadow-md hover:bg-teal-600 transition-colors duration-300"
-            >
-              <FontAwesomeIcon icon={faEye} className="mr-2" />
-              ดูรูปภาพที่มีอยู่
-            </button>
-
-            <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={() => setModalIsOpen(false)}
-            >
-              <h2 className="text-lg font-semibold mb-2">รูปภาพที่มีอยู่</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sortedBanners.map((banner, index) => (
-                  <div key={index} className="relative">
+      ) : (
+        <div className="flex justify-center mt-5 px-10 md:px-0">
+          <div className="w-4/5">
+            <div className="w-full flex justify-center">
+              <div className="w-full relative rounded-lg overflow-hidden bg-gray-900">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                >
+                  {sortedBanners.map((banner, index) => (
                     <img
+                      key={index}
                       src={banner}
                       alt={`Banner ${index}`}
-                      className="w-full h-[200px] object-cover"
+                      className="w-full h-36 md:h-[400px] object-cover flex-shrink-0"
                     />
+                  ))}
+                </div>
+
+                <button
+                  onClick={goToPrevious}
+                  className="hidden md:flex absolute top-1/2 left-4 transform -translate-y-1/2 bg-teal-700 text-white rounded-md p-3 shadow-md hover:bg-teal-600 transition-colors duration-300 z-10 opacity-75 hover:opacity-100"
+                >
+                  <FontAwesomeIcon icon={faChevronLeft} className="h-6 w-6" />
+                </button>
+
+                <button
+                  onClick={goToNext}
+                  className="hidden md:flex absolute top-1/2 right-4 transform -translate-y-1/2 bg-teal-700 text-white rounded-md p-3 shadow-md hover:bg-teal-600 transition-colors duration-300 z-10 opacity-75 hover:opacity-100"
+                >
+                  <FontAwesomeIcon icon={faChevronRight} className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {isAdmin && (
+              <>
+                <div className="mt-5 text-center">
+                  <h2 className="text-lg font-semibold mb-2">
+                    เพิ่มรูปภาพ Banner ใหม่
+                  </h2>
+                  <UploadImage onSuccess={handleUploadSuccess} />
+                  <button
+                    onClick={() => setModalIsOpen(true)}
+                    className="mt-4 bg-teal-700 text-white rounded-md p-2 shadow-md hover:bg-teal-600 transition-colors duration-300"
+                  >
+                    <FontAwesomeIcon icon={faEye} className="mr-2" />
+                    ดูรูปภาพที่มีอยู่
+                  </button>
+
+                  <Modal
+                    isOpen={modalIsOpen}
+                    onRequestClose={() => setModalIsOpen(false)}
+                  >
+                    <h2 className="text-lg font-semibold mb-2">
+                      รูปภาพที่มีอยู่
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {sortedBanners.map((banner, index) => (
+                        <div key={index} className="relative">
+                          <img
+                            src={banner}
+                            alt={`Banner ${index}`}
+                            className="w-full h-[200px] object-cover"
+                          />
+                          <button
+                            onClick={() => deleteBanner(banner)}
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 shadow-md hover:bg-red-500 transition-colors duration-300"
+                          >
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              className="h-4 w-4"
+                            />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                     <button
-                      onClick={() => deleteBanner(banner)}
-                      className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 shadow-md hover:bg-red-500 transition-colors duration-300"
+                      onClick={() => setModalIsOpen(false)}
+                      className="mt-4 bg-red-500 text-white rounded-md p-2 shadow-md hover:bg-red-400 transition-colors duration-300"
                     >
-                      <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                      ปิด
                     </button>
+                  </Modal>
+                </div>
+              </>
+            )}
+
+            {/* <div className="relative py-8 ">
+              <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
+                ข่าวเด่น
+                <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
+              </h2>
+              <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
+            </div>
+            <div className="grid grid-cols-3 gap-8">
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <img
+                  src={banner1}
+                  alt="News Image 1"
+                  className="w-full h-85 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    การปรับแก้ไขคะแนนความประพฤติ
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    วันที่ 1 สิงหาคม 2566...
+                  </p>
+                  <Link to="/news/1" className="text-red-600 hover:underline">
+                    อ่านเพิ่มเติม
+                  </Link>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <img
+                  src={banner2}
+                  alt="News Image 2"
+                  className="w-full h-85 object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">
+                    ผู้บริหาร ข้าราชการและเจ้าหน้าที่
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    วันที่ 2 สิงหาคม 2566...
+                  </p>
+                  <Link to="/news/2" className="text-red-600 hover:underline">
+                    อ่านเพิ่มเติม
+                  </Link>
+                </div>
+              </div>
+            </div>
+            <div className="relative container mx-auto py-8 ">
+              <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
+            </div> */}
+            <GridContainer
+              to="/show_activity/ข่าวสาร"
+              title="ข่าวสาร"
+              activity={dataNews}
+            />
+            {/* <div>
+            
+              <div className="relative py-8">
+                <Link to={`/show_activity/ข่าวสาร`}>
+                  <div className="relative inline-block py-2 rounded-tl-lg text-3xl font-bold text-gray-600 hover:text-lime-500">
+                    <h2 className="flex items-center gap-2 hover:gap-4 duration-300">
+                      ข่าวสาร{" "}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={3}
+                        stroke="currentColor"
+                        className="size-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                        />
+                      </svg>
+                    </h2>
+
+                    <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
+                  </div>
+                </Link>
+
+                <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {dataNews.map((item) => (
+                  <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <img
+                      src={item.img}
+                      alt="News Image 1"
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-4">
+                      <Link
+                        to={`/activity/${item.id}`}
+                        state={{ item }}
+                        className="hover:underline"
+                      >
+                        <h3 className="text-base font-semibold mb-2 line-clamp-3">
+                          {item.title}
+                        </h3>
+                      </Link>
+
+                      <p className="text-sm text-gray-600 mb-4">
+                        {item.date_activity
+                          ? `วันที่ ${item.date_activity
+                              .toDate()
+                              .toLocaleDateString("th-TH")}`
+                          : "ไม่ระบุวันที่"}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
-              <button
-                onClick={() => setModalIsOpen(false)}
-                className="mt-4 bg-red-500 text-white rounded-md p-2 shadow-md hover:bg-red-400 transition-colors duration-300"
-              >
-                ปิด
-              </button>
-            </Modal>
+            </div> */}
+<GridContainer
+              to="/show_activity/กิจกรรม"
+              title="กิจกรรม"
+              activity={dataActivitys}
+            />
+            <GridContainer
+              to="/show_activity/ผลงาน"
+              title="ผลงาน"
+              activity={dataContributions}
+            />
           </div>
-        </>
+        </div>
       )}
-
-      <div className="container mx-auto  ">
-        <div className="relative container mx-auto py-8 ">
-          <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
-            ข่าวเด่น
-            <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
-          </h2>
-          <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
-        </div>
-        <div className="grid grid-cols-1 gap-8">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner1}
-              alt="News Image 1"
-              className="w-full h-85 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                การปรับแก้ไขคะแนนความประพฤติ
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 1 สิงหาคม 2566...
-              </p>
-              <Link to="/news/1" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={banner2}
-              alt="News Image 2"
-              className="w-full h-85 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-2">
-                ผู้บริหาร ข้าราชการและเจ้าหน้าที่
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                วันที่ 2 สิงหาคม 2566...
-              </p>
-              <Link to="/news/2" className="text-red-600 hover:underline">
-                Read more
-              </Link>
-            </div>
-          </div>
-        </div>
-        <div className="relative container mx-auto py-8 ">
-          <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
-        </div>
-      </div>
-
-      <div className="container mx-auto py-8">
-        <div className="relative container mx-auto py-8">
-          <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
-            ข่าวสาร
-            <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
-          </h2>
-          <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {dataNews.map((item) => (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <img
-                src={item.img}
-                alt="News Image 1"
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {item.date_activity
-                    ? `วันที่ ${item.date_activity
-                        .toDate()
-                        .toLocaleDateString("th-TH")}`
-                    : "ไม่ระบุวันที่"}
-                </p>
-                <Link
-                  to={`/activity/${item.id}`}
-                  state={{ item }}
-                  className="text-red-600 hover:underline"
-                >
-                  Read more
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="relative container mx-auto py-8 ">
-          <button
-            onClick={() => navigate(`/show_activity/ข่าวสาร`)}
-            type="button"
-            className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-          >
-            ข่าวสารทั้งหมด
-          </button>
-          <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
-        </div>
-      </div>
-
-      <div className="container mx-auto  ">
-        <div className="relative container mx-auto py-8">
-          <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
-            กิจกรรม
-            <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
-          </h2>
-          <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8">
-          {dataActivitys.map((item) => (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <img
-                src={item.img}
-                alt="News Image 1"
-                className="w-full h-80 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {item.date_activity
-                    ? `วันที่ ${item.date_activity
-                        .toDate()
-                        .toLocaleDateString("th-TH")}`
-                    : "ไม่ระบุวันที่"}
-                </p>
-                <Link
-                  to={`/activity/${item.id}`}
-                  state={{ item }}
-                  className="text-red-600 hover:underline"
-                >
-                  Read more
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="relative container mx-auto py-8 ">
-          <button
-            type="button"
-            onClick={() => navigate(`/show_activity/กิจกรรม`)}
-            className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-          >
-            กิจกรรมทั้งหมด
-          </button>
-          <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
-        </div>
-      </div>
-      <div className="container mx-auto  ">
-        <div className="relative container mx-auto py-8">
-          <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
-            ผลงาน
-            <span className="absolute left-0 bottom-0 w-full h-1 bg-lime-200 transform translate-y-full"></span>
-          </h2>
-          <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8">
-          {dataWorks.map((item) => (
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <img
-                src={item.img}
-                alt="News Image 1"
-                className="w-full h-80 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {item.date_activity
-                    ? `วันที่ ${item.date_activity
-                        .toDate()
-                        .toLocaleDateString("th-TH")}`
-                    : "ไม่ระบุวันที่"}
-                </p>
-                <Link
-                  to={`/activity/${item.id}`}
-                  state={{ item }}
-                  className="text-red-600 hover:underline"
-                >
-                  Read more
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="relative container mx-auto py-8 ">
-          <button
-            type="button"
-            onClick={() => navigate(`/show_activity/ผลงาน`)}
-            className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-          >
-            ผลงานทั้งหมด
-          </button>
-          <span className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-600 transform translate-y-full"></span>
-        </div>
-      </div>
-
-      <div className="relative bg-teal-700 text-white py-8 flex flex-col items-center">
-        <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 items-center justify-center">
-          <div className="text-center">
-            <FontAwesomeIcon
-              icon={faUserGraduate}
-              className="text-4xl md:text-6xl mb-4 text-white"
-            />
-            <h2 className="text-3xl md:text-5xl font-bold">3,297</h2>
-            <p className="text-base md:text-lg mt-2">จำนวนนักเรียน</p>
-          </div>
-          <div className="text-center">
-            <FontAwesomeIcon
-              icon={faSchool}
-              className="text-4xl md:text-6xl mb-4 text-white"
-            />
-            <h2 className="text-3xl md:text-5xl font-bold">16</h2>
-            <p className="text-base md:text-lg mt-2">จำนวนห้องเรียน</p>
-          </div>
-          <div className="text-center">
-            <FontAwesomeIcon
-              icon={faChalkboardTeacher}
-              className="text-4xl md:text-6xl mb-4 text-white"
-            />
-            <h2 className="text-3xl md:text-5xl font-bold">99</h2>
-            <p className="text-base md:text-lg mt-2">
-              จำนวนผู้บริหารและข้าราชการครู
-            </p>
-          </div>
-        </div>
-      </div>
     </>
   );
 };

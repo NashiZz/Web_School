@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
   faTimes,
-  faSearch,
   faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -26,7 +25,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 type DropdownMenu = "about" | "humen" | "activity" | "";
 
 function Header() {
-  const [showSearch, setShowSearch] = useState<boolean>(false);
+  // const [showSearch, setShowSearch] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [dropdownOpen, setDropdownOpen] = useState<DropdownMenu>("");
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -207,13 +206,13 @@ function Header() {
             >
               <Link
                 to="/"
-                className="block text-gray-700 hover:text-white py-2"
+                className="block text-gray-700 hover:text-white py-2 duration-200"
               >
                 หน้าแรก
               </Link>
               <Link
                 to="/school_history"
-                className="block text-gray-700 hover:text-white py-2"
+                className="block text-gray-700 hover:text-white py-2 duration-200"
               >
                 ประวัติโรงเรียน
               </Link>
@@ -223,7 +222,7 @@ function Header() {
                   onMouseEnter={() => handleDropdownMouseEnter("humen")}
                 >
                   <button
-                    className="block text-gray-700 hover:text-white py-2 items-center"
+                    className="block text-gray-700 hover:text-white py-2 items-center duration-200"
                     onClick={() => navigate("/show_all_personal")}
                   >
                     จัดการบุคลากรโรงเรียนทั้งหมด
@@ -233,21 +232,22 @@ function Header() {
                 <div
                   className="relative"
                   onMouseEnter={() => handleDropdownMouseEnter("humen")}
+                  onMouseLeave={handleDropdownMouseLeave}
                 >
-                  <button className="block text-gray-700 hover:text-white py-2 items-center">
+                  <button className="block text-gray-700 hover:text-white py-2 items-center duration-200">
                     บุคลากรโรงเรียน
                     <FontAwesomeIcon icon={faChevronDown} className="ml-2" />
                   </button>
                   {dropdownOpen === "humen" && (
                     <div
-                      className="absolute left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20"
+                      className={`absolute left-0 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20`}
                       onMouseLeave={handleDropdownMouseLeave}
                     >
                       {department.current.map((dept, index) => (
                         <Link
                           key={index}
                           to={`/personnel/${dept.name}`}
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
                         >
                           {dept.name}
                         </Link>
@@ -260,21 +260,22 @@ function Header() {
               <div
                 className="relative"
                 onMouseEnter={() => handleDropdownMouseEnter("activity")}
+                onMouseLeave={handleDropdownMouseLeave}
               >
-                <button className="block text-gray-700 hover:text-white py-2 items-center">
+                <button className="block text-gray-700 hover:text-white py-2 items-center duration-200">
                   กิจกรรม/ผลงาน
                   <FontAwesomeIcon icon={faChevronDown} className="ml-2" />
                 </button>
                 {dropdownOpen === "activity" && (
                   <div
-                    className="absolute left-0 mt-2 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20"
+                    className="absolute left-0 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20"
                     onMouseLeave={handleDropdownMouseLeave}
                   >
                     {ActivitiesoOrWorks.map((dept, index) => (
                       <Link
                         key={index}
                         to={`/show_activity/${dept}`}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
                       >
                         {dept}
                       </Link>
@@ -282,16 +283,16 @@ function Header() {
                   </div>
                 )}
               </div>
-              <Link
+              {/* <Link
                 to="/contact"
                 className="block text-gray-700 hover:text-white py-2"
               >
                 ติดต่อ
-              </Link>
+              </Link> */}
             </nav>
 
             <div className="flex items-center space-x-4 w-full md:w-auto">
-              {showSearch && (
+              {/* {showSearch && (
                 <input
                   type="text"
                   placeholder="ค้นหา..."
@@ -303,7 +304,7 @@ function Header() {
                 onClick={() => setShowSearch(!showSearch)}
               >
                 <FontAwesomeIcon icon={faSearch} className="h-6 w-6" />
-              </button>
+              </button> */}
 
               {user ? (
                 <button

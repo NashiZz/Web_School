@@ -29,9 +29,10 @@ const routers = createBrowserRouter([
       { path: "/add_data", element: <AddData_Page /> },
       { path: "/addpersonal", element: <AddPersonalPage /> },
       { path: "/show_all_personal", element: <ShowAllPersonnel /> },
-      { path: "/login", element: <Login /> },
+      
     ],
-  }
+  },
+  { path: "/login", element: <Login /> },
 ]);
 
 function App() {

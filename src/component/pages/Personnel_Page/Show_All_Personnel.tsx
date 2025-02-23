@@ -27,7 +27,12 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import { db, storage } from "../../../firebase";
 import { PersonnelModel } from "../../../model/personnel";
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import { departmentModel } from "../../../model/department";
@@ -39,26 +44,65 @@ import {
 } from "firebase/storage";
 import { PersonnelRequestModel } from "../../../model/personnel_req";
 import { Link } from "react-router-dom";
-interface PersonnelState {
+type PersonnelState = {
   personnel: PersonnelModel[];
   loading: boolean;
-}
+  originalPersonnel?: PersonnelModel[]; // เพิ่มเพื่อเก็บข้อมูลต้นฉบับ
+};
 
-interface Action {
-  type: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any;
-}
+type Action =
+  | { type: "SET_PERSONNEL"; payload: PersonnelModel[] }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SEARCH_PERSONNEL"; payload: string }
+  | { type: "RESET_SEARCH" };
 
+// Updated Reducer
 const personnelReducer = (
   state: PersonnelState,
   action: Action
 ): PersonnelState => {
   switch (action.type) {
     case "SET_PERSONNEL":
-      return { ...state, personnel: action.payload, loading: false };
+      return {
+        ...state,
+        personnel: action.payload,
+        originalPersonnel: action.payload, // เก็บข้อมูลต้นฉบับ
+        loading: false,
+      };
     case "SET_LOADING":
       return { ...state, loading: action.payload };
+    case "SEARCH_PERSONNEL": {
+      if (!state.originalPersonnel) return state;
+
+      const searchTerm = action.payload.toLowerCase().trim();
+      if (!searchTerm) {
+        return {
+          ...state,
+          personnel: state.originalPersonnel,
+        };
+      }
+
+      const filteredPersonnel = state.originalPersonnel.filter((person) => {
+        return (
+          person.prefix?.toLowerCase().includes(searchTerm) ||
+          person.firstname?.toLowerCase().includes(searchTerm) ||
+          person.lastname?.toLowerCase().includes(searchTerm) ||
+          person.position?.toLowerCase().includes(searchTerm) ||
+          person.department?.toLowerCase().includes(searchTerm) ||
+          person.level?.toLowerCase().includes(searchTerm)
+        );
+      });
+
+      return {
+        ...state,
+        personnel: filteredPersonnel,
+      };
+    }
+    case "RESET_SEARCH":
+      return {
+        ...state,
+        personnel: state.originalPersonnel || state.personnel,
+      };
     default:
       return state;
   }
@@ -81,7 +125,6 @@ const ShowAllPersonnel = () => {
   const [image, setImage] = useState<string | null>(null);
   const department = useRef<departmentModel[]>([]);
   const [departmentName, setDepartment] = useState("");
-  // State to keep track of the checkbox's checked status
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pid, setPid] = useState(0);
@@ -109,7 +152,6 @@ const ShowAllPersonnel = () => {
     setOpenDel(false);
     window.location.reload();
     loadDataPersonnel();
-    
   };
   const handleSubmit = async () => {
     if (!activePersonId) {
@@ -120,24 +162,23 @@ const ShowAllPersonnel = () => {
     setLoading(true);
 
     try {
-      let imageURL = image; // Keep the existing image URL if no new image is uploaded
+      let imageURL = image; 
       if (imageFile) {
         imageURL = (await uploadImage(imageFile)) || "";
       }
 
       const updatedPersonnel: Partial<PersonnelRequestModel> = {
-        firstname: firstname, // Use state value
-        lastname: lastname, // Use state value
-        prefix: prefix, // Use state value
-        position: position, // Use state value
-        department: departmentName, // Use state value
-        img: imageURL!, // Image URL from upload
+        firstname: firstname, 
+        lastname: lastname, 
+        prefix: prefix, 
+        position: position, 
+        department: departmentName, 
+        img: imageURL!, 
         level: level,
         pid: pid,
         isLeader: isChecked ? isChecked : false,
       } as PersonnelRequestModel;
 
-      // Reference the document by ID and update it
       const personnelDoc = doc(personnelRef, activePersonId);
       await updateDoc(personnelDoc, updatedPersonnel);
 
@@ -183,14 +224,11 @@ const ShowAllPersonnel = () => {
       const personnelData = await getDocs(
         query(personnelRef, orderBy("pid", "asc"))
       );
-
       const getPersonnel = personnelData.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       })) as PersonnelModel[];
       console.log(getPersonnel);
-
-      // totalPages.current = Math.ceil(getPersonnel.length / 10)
       dispatch({ type: "SET_PERSONNEL", payload: getPersonnel });
     } catch (error) {
       console.error("Error fetching personnel data: ", error);
@@ -201,8 +239,6 @@ const ShowAllPersonnel = () => {
 
   useEffect(() => {
     loadDataPersonnel();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -251,6 +287,20 @@ const ShowAllPersonnel = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const searchInput = document.getElementById(
+      "search-dropdown"
+    ) as HTMLInputElement;
+    dispatch({ type: "SEARCH_PERSONNEL", payload: searchInput.value });
+  };
+
+  // Optional: Real-time search
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: "SEARCH_PERSONNEL", payload: e.target.value });
+  };
+
   return (
     <>
       {state.loading ? (
@@ -266,14 +316,15 @@ const ShowAllPersonnel = () => {
         >
           <List sx={{ width: "60%", bgcolor: "background.paper" }}>
             <div className="flex flex-row justify-center">
-              <form className="max-w-lg mx-auto mt-1">
+              <form className="max-w-lg mx-auto mt-1" onSubmit={handleSearch}>
                 <div className="flex">
                   <div className="relative w-full">
                     <input
                       type="search"
                       id="search-dropdown"
-                      className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-lime-100  border-lime-200"
+                      className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-lime-100 border-lime-200"
                       placeholder="Search"
+                      onChange={handleSearchChange} // ถ้าต้องการค้นหาแบบ real-time
                     />
                     <button
                       type="submit"
@@ -311,7 +362,7 @@ const ShowAllPersonnel = () => {
                 </button>
               </Link>
             </div>
-            {state.personnel.map((person) => (
+            {state.personnel.map((person: PersonnelModel) => (
               <React.Fragment key={person.id}>
                 <ListItem alignItems="flex-start">
                   <ListItemAvatar>

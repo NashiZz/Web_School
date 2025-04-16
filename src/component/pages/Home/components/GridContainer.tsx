@@ -14,9 +14,9 @@ const GridContainer: React.FC<GridContainerProps> = ({
 }) => {
   return (
     <>
-      <div className="relative py-8">
+      <div className="relative pt-3 pb-8 md:pt-8 md:pb-8">
         <Link to={to}>
-          <div className="relative inline-block py-2 rounded-tl-lg text-2xl font-bold text-gray-600 hover:text-lime-500">
+          <div className="relative inline-block py-0.5 md:py-2 rounded-tl-lg text-base md:text-2xl font-bold text-gray-600 hover:text-lime-500">
             <h2 className="flex items-center gap-2 hover:gap-4 duration-300">
               {title}
               <svg
@@ -39,41 +39,40 @@ const GridContainer: React.FC<GridContainerProps> = ({
         </Link>
 
         <div className="absolute inset-x-0 bottom-7 border-b-4 border-lime-200 mt-2"></div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8">
+        {activity.map((item) => (
+          <div
+            key={item.id}
+            className="bg-white rounded-lg shadow-lg overflow-hidden"
+          >
+            <img
+              src={item.img}
+              alt={item.title || "News Image"}
+              className="w-full h-40 object-cover"
+            />
+            <div className="p-4">
+              <Link
+                to={`/activity/${item.id}`}
+                state={{ item }}
+                className="hover:underline"
+              >
+                <h3 className="text-base font-semibold mb-2 line-clamp-3">
+                  {item.title}
+                </h3>
+              </Link>
 
-        
-      </div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {activity.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden"
-            >
-              <img
-                src={item.img}
-                alt={item.title || "News Image"}
-                className="w-full h-40 object-cover"
-              />
-              <div className="p-4">
-                <Link
-                  to={`/activity/${item.id}`}
-                  state={{ item }}
-                  className="hover:underline"
-                >
-                  <h3 className="text-base font-semibold mb-2 line-clamp-3">
-                    {item.title}
-                  </h3>
-                </Link>
-
-                <p className="text-sm text-gray-600 mb-4">
-                  {item.date_activity
-                    ? `วันที่ ${item.date_activity
-                        .toDate()
-                        .toLocaleDateString("th-TH")}`
-                    : "ไม่ระบุวันที่"}
-                </p>
-              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                {item.date_activity
+                  ? `วันที่ ${item.date_activity
+                      .toDate()
+                      .toLocaleDateString("th-TH")}`
+                  : "ไม่ระบุวันที่"}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
     </>
   );
 };

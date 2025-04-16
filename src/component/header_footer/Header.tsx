@@ -98,7 +98,7 @@ function Header() {
       await signOut(auth);
       setUser(null);
       localStorage.setItem("isAdmin", "false");
-      alert("ออกจากระบบสำเร็จ");
+      // alert("ออกจากระบบสำเร็จ");
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -289,10 +289,25 @@ function Header() {
               >
                 ติดต่อ
               </Link> */}
+              {user ? (
+                <button
+                  className="block text-gray-700 hover:text-white py-2"
+                  onClick={handleLogout}
+                >
+                  ออกจากระบบ
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="block text-gray-700 hover:text-white py-2"
+                >
+                  เข้าสู่ระบบ
+                </Link>
+              )}
             </nav>
 
-            <div className="flex items-center space-x-4 w-full md:w-auto">
-              {/* {showSearch && (
+            {/* <div className="flex items-center space-x-4 w-full md:w-auto">
+              {showSearch && (
                 <input
                   type="text"
                   placeholder="ค้นหา..."
@@ -304,7 +319,7 @@ function Header() {
                 onClick={() => setShowSearch(!showSearch)}
               >
                 <FontAwesomeIcon icon={faSearch} className="h-6 w-6" />
-              </button> */}
+              </button>
 
               {user ? (
                 <button
@@ -321,7 +336,7 @@ function Header() {
                   เข้าสู่ระบบ
                 </Link>
               )}
-            </div>
+            </div> */}
           </div>
         </header>
       )}

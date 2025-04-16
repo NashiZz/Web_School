@@ -180,7 +180,7 @@ const Home = () => {
         </div>
       ) : (
         <div className="flex justify-center mt-5 px-10 md:px-0">
-          <div className="w-4/5">
+          <div className="w-full md:w-4/5">
             <div className="w-full flex justify-center">
               <div className="w-full relative rounded-lg overflow-hidden bg-gray-900">
                 <div

@@ -13,7 +13,7 @@ const DetailAct_Page = () => {
   }
 
     return (
-        <div className="bg-purple-100 py-12 px-6 ">
+        <div className="bg-white py-12 px-6 ">
             <div className="container mx-auto max-w-2xl bg-white rounded-lg shadow-lg relative">
                 <div className="relative">
                     <img

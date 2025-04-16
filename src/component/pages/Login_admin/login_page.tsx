@@ -26,7 +26,7 @@ const Login = () => {
 
                 {error && <div className="text-red-500 mb-4">{error}</div>}
 
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleLogin} autoComplete="on">
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             อีเมล
@@ -34,6 +34,8 @@ const Login = () => {
                         <input
                             type="email"
                             id="email"
+                            name="email"
+                            autoComplete="username"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -48,6 +50,8 @@ const Login = () => {
                         <input
                             type="password"
                             id="password"
+                            name="password"
+                            autoComplete="current-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required

@@ -1,4 +1,4 @@
-import { useEffect , useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import { styled } from "@mui/material/styles";
@@ -13,7 +13,7 @@ import {
   doc,
   orderBy,
   updateDoc,
-  QueryDocumentSnapshot, 
+  QueryDocumentSnapshot,
   DocumentData,
 } from "firebase/firestore";
 import { activityModel } from "../../../model/activitys";
@@ -34,7 +34,8 @@ const ActivityPage = () => {
   const [data, setData] = useState<activityModel[]>([]); // ใช้ state เดียวสำหรับจัดการทั้ง activitys และ works
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);// เก็บ reference ของ document ล่าสุดที่ถูกดึง
+  const [lastVisible, setLastVisible] =
+    useState<QueryDocumentSnapshot<DocumentData> | null>(null); // เก็บ reference ของ document ล่าสุดที่ถูกดึง
   const [totalPages, setTotalPages] = useState(0); // จำนวนหน้าทั้งหมด
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
@@ -63,7 +64,11 @@ const ActivityPage = () => {
           limit(itemsPerPage)
         );
       } else {
-        q = query(colRef, orderBy("date_activity", "desc"), limit(itemsPerPage));
+        q = query(
+          colRef,
+          orderBy("date_activity", "desc"),
+          limit(itemsPerPage)
+        );
       }
 
       const snapshot = await getDocs(q);
@@ -73,9 +78,8 @@ const ActivityPage = () => {
       })) as activityModel[];
 
       setLastVisible(snapshot.docs[snapshot.docs.length - 1]); // เก็บ document ล่าสุด
-     
+
       setData(list);
-      
     } catch (error) {
       console.error("Error fetching data: ", error);
     } finally {
@@ -87,7 +91,7 @@ const ActivityPage = () => {
     try {
       await deleteDoc(doc(db, collectionName, id));
       setData((prevData) => prevData.filter((item) => item.id !== id));
-      const oldImageRef = ref(storage,selected?.img);
+      const oldImageRef = ref(storage, selected?.img);
       await deleteObject(oldImageRef);
       window.location.reload();
     } catch (error) {
@@ -152,28 +156,27 @@ const ActivityPage = () => {
 
       if (imageFile) {
         if (selected?.img) {
-          const oldImageRef = ref(storage,selected.img);
+          const oldImageRef = ref(storage, selected.img);
           await deleteObject(oldImageRef);
         }
 
-
         let storageRef = "";
         if (activity === "กิจกรรม") {
-          storageRef = 'activitys';
+          storageRef = "activitys";
         } else if (activity === "ผลงาน") {
-          storageRef = 'works';
+          storageRef = "works";
         } else if (activity === "ข่าวสาร") {
-          storageRef = 'ข่าวสาร';
+          storageRef = "ข่าวสาร";
         }
 
-        const imageRef = ref(storage, `${storageRef}/${Timestamp.now()}${imageFile.name}`);
+        const imageRef = ref(
+          storage,
+          `${storageRef}/${Timestamp.now()}${imageFile.name}`
+        );
         await uploadBytes(imageRef, imageFile);
 
         imageUrl = await getDownloadURL(imageRef);
-        
       }
-      
-      
 
       // let imageURL = "";
       // if (imageFile) {
@@ -184,7 +187,7 @@ const ActivityPage = () => {
         title: title,
         body: body,
         date_activity: selectedDate,
-        img:imageUrl
+        img: imageUrl,
       });
       setSelectedItem(null);
       setIsOpenEdit(false);
@@ -220,9 +223,9 @@ const ActivityPage = () => {
   useEffect(() => {
     // รีเซ็ต currentPage เป็น 1 เมื่อ activity เปลี่ยน
     setCurrentPage(1);
-}, [activity]); // เมื่อ activity เปลี่ยน currentPage จะถูกตั้งเป็น 1
+  }, [activity]); // เมื่อ activity เปลี่ยน currentPage จะถูกตั้งเป็น 1
 
-useEffect(() => {
+  useEffect(() => {
     switch (activity) {
       case "กิจกรรม":
         fetchData("activitys", currentPage);
@@ -236,7 +239,7 @@ useEffect(() => {
       default:
         console.error("ไม่พบประเภท activity ที่ระบุ");
     }
-}, [activity, currentPage]); // โหลดข้อมูลใหม่เมื่อ activity หรือ page เปลี่ยน
+  }, [activity, currentPage]); // โหลดข้อมูลใหม่เมื่อ activity หรือ page เปลี่ยน
 
   const StyledPagination = styled(Pagination)({
     "& .MuiPaginationItem-page.Mui-selected": {
@@ -255,23 +258,24 @@ useEffect(() => {
     );
   }
 
-  if (localStorage.getItem("isAdmin") == "true") {
-    return (
-      <>
-        {data.length === 0 ? (
-          <p>ไม่มีข้อมูลที่จะแสดง</p> // แสดงข้อความเมื่อไม่มีข้อมูล
-        ) : (
-          <div>
-            <div className="relative container mx-auto py-8 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-              <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
-                {activity}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8">
-                {data.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-lg shadow-lg relative overflow-hidden"
-                  >
+  // if (localStorage.getItem("isAdmin") == "true") {
+  return (
+    <>
+      {data.length === 0 ? (
+        <p>ไม่มีข้อมูลที่จะแสดง</p> // แสดงข้อความเมื่อไม่มีข้อมูล
+      ) : (
+        <div>
+          <div className="relative container mx-auto py-8 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
+            <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
+              {activity}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8">
+              {data.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg shadow-lg relative overflow-hidden"
+                >
+                  {localStorage.getItem("isAdmin") == "true" && (
                     <button
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-700"
                       onClick={() => {
@@ -293,88 +297,14 @@ useEffect(() => {
                         />
                       </svg>
                     </button>
-                    {isOpen && (
-                      <div
-                        id="popup-modal"
-                        tabIndex={-1}
-                        className="fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center items-center " // ใช้ flex เพื่อจัดตำแหน่ง
-                      >
-                        <div className="relative p-4 w-full max-w-md max-h-full">
-                          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <button
-                              type="button"
-                              className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                              onClick={handleCloseModal}
-                            >
-                              <svg
-                                className="w-3 h-3"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 14 14"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M1 1l6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                                />
-                              </svg>
-                              <span className="sr-only">Close modal</span>
-                            </button>
-                            <div className="p-4 md:p-5 text-center">
-                              <svg
-                                className="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                />
-                              </svg>
-                              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                คุณต้องการลบ {activity} {selected?.title} ใช่ไหม
-                              </h3>
-                              <button
-                                type="button"
-                                className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-                                onClick={() => {
-                                  if (activity === "กิจกรรม") {
-                                    handleRemove(selected!.id, "activitys");
-                                  } else if (activity === "ผลงาน") {
-                                    handleRemove(selected!.id, "works");
-                                  } else if (activity === "ข่าวสาร") {
-                                    handleRemove(selected!.id, "news");
-                                  }
-                                }} // เรียกใช้ฟังก์ชันลบ
-                              >
-                                Yes, I'm sure
-                              </button>
-                              <button
-                                type="button"
-                                className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                                onClick={handleCloseModal} // ปิด modal
-                              >
-                                No, cancel
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                  )}
 
+                  {localStorage.getItem("isAdmin") == "true" && (
                     <button
                       className="absolute top-14 right-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-blue-950"
                       onClick={() => {
                         handleSelectItemEdit(item);
-                      }} // ฟังก์ชันสำหรับลบ
+                      }} // ฟังก์ชันสำหรับแก้ไข
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -391,231 +321,305 @@ useEffect(() => {
                         />
                       </svg>
                     </button>
-                    {isOpenEdit && (
-                      <div
-                        id="popup-modal"
-                        tabIndex={-1}
-                        className="fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center items-center"
-                      >
-                        <div className="relative p-4 w-full max-w-md max-h-full">
-                          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                            <button
-                              type="button"
-                              className="absolute top-1 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                              onClick={handleCloseModalEdit}
-                            >
-                              <svg
-                                className="w-3 h-3"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 14 14"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M1 1l6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                                />
-                              </svg>
-                              <span className="sr-only">Close modal</span>
-                            </button>
-                            <div className="p-4 md:p-10 mt-5">
-                              <div className="flex justify-center mb-8">
-                                <div className="bg-purple-200 w-80 h-60 flex items-center justify-center cursor-pointer relative">
-                                  <img
-                                    src={image!}
-                                    alt="Selected"
-                                    className="w-full h-full object-cover"
-                                  />
-                                  <label
-                                    htmlFor="file"
-                                    className="absolute inset-0 flex items-center justify-center"
-                                  >
-                                    <label htmlFor="file">
-                                      <SyncIcon style={{ fontSize: 40 }} />
-                                    </label>
-                                  </label>
-                                  <input
-                                    id="file"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    style={{ display: "none" }}
-                                  />
-                                </div>
-                              </div>
+                  )}
 
-                              {/* หัวเรื่อง */}
-                              <div className="mb-4 ">
-                                <label className="block text-left text-white text-sm font-bold mb-2">
-                                  หัวเรื่อง
-                                </label>
-                                <input
-                                  value={title} // ใช้ title state แทน
-                                  onChange={(e) => setTitle(e.target.value)}
-                                  type="text"
-                                  placeholder="หัวเรื่อง"
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                              </div>
-
-                              {/* วันที่/เดือน/ปี */}
-                              <div className="mb-4">
-                                <label className="block text-left text-white text-sm font-bold mb-2">
-                                  วันที่/เดือน/ปี
-                                </label>
-                                <DatePicker
-                                  selected={selectedDate}
-                                  onChange={(date: Date | null) =>
-                                    setSelectedDate(date)
-                                  }
-                                  showTimeSelect
-                                  dateFormat="Pp"
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  placeholderText="เลือกวันที่และเวลา"
-                                />
-                              </div>
-
-                              {/* รายละเอียด */}
-                              <div className="mb-4">
-                                <label className="block text-left text-white text-sm font-bold mb-2">
-                                  รายละเอียด
-                                </label>
-                                <textarea
-                                  value={body} // ใช้ title state แทน
-                                  onChange={(e) => setBody(e.target.value)}
-                                  placeholder="รายละเอียด"
-                                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                  rows={4}
-                                ></textarea>
-                              </div>
-
-                              <div className="flex justify-center mt-4">
-                                {" "}
-                                {/* เพิ่ม flex และ justify-center */}
-                                <button
-                                  type="button"
-                                  className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
-                                  onClick={() => {
-                                    handleSaveEdit();
-                                  }}
-                                >
-                                  Save
-                                </button>
-                                <button
-                                  type="button"
-                                  className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-                                  onClick={handleCloseModalEdit}
-                                >
-                                  No, cancel
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <img
-                      src={item.img}
-                      alt={`Activity Image ${item.id}`}
-                      className="w-full h-72 object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold mb-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {item.date_activity
-                          ? `วันที่ ${item.date_activity
-                              .toDate()
-                              .toLocaleDateString("th-TH")}`
-                          : "ไม่ระบุวันที่"}
-                      </p>
-                      <Link
-                        to={`/activity/${item.id}`}
-                        state={{ item }}
-                        className="text-red-600 hover:underline"
-                      >
-                        Read more
-                      </Link>
-                    </div>
+                  <img
+                    src={item.img}
+                    alt={`Activity Image ${item.id}`}
+                    className="w-full h-72 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {item.date_activity
+                        ? `วันที่ ${item.date_activity
+                            .toDate()
+                            .toLocaleDateString("th-TH")}`
+                        : "ไม่ระบุวันที่"}
+                    </p>
+                    <Link
+                      to={`/activity/${item.id}`}
+                      state={{ item }}
+                      className="text-red-600 hover:underline"
+                    >
+                      Read more
+                    </Link>
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pagination */}
+          <StyledPagination
+            className="flex justify-center pb-9"
+            count={totalPages} // จำนวนหน้าทั้งหมด
+            page={currentPage} // หน้าในปัจจุบัน
+            onChange={(_event, value) => setCurrentPage(value)} // เปลี่ยนหน้า
+          />
+        </div>
+      )}
+
+      {isOpen && (
+        <div
+          id="popup-modal"
+          tabIndex={-1}
+          className="fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center items-center " // ใช้ flex เพื่อจัดตำแหน่ง
+        >
+          <div className="relative p-4 w-full max-w-md max-h-full">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <button
+                type="button"
+                className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                onClick={handleCloseModal}
+              >
+                <svg
+                  className="w-3 h-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M1 1l6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                  />
+                </svg>
+                <span className="sr-only">Close modal</span>
+              </button>
+              <div className="p-4 md:p-5 text-center">
+                <svg
+                  className="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                  />
+                </svg>
+                <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                  คุณต้องการลบ {activity} {selected?.title} ใช่ไหม
+                </h3>
+                <button
+                  type="button"
+                  className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
+                  onClick={() => {
+                    if (activity === "กิจกรรม") {
+                      handleRemove(selected!.id, "activitys");
+                    } else if (activity === "ผลงาน") {
+                      handleRemove(selected!.id, "works");
+                    } else if (activity === "ข่าวสาร") {
+                      handleRemove(selected!.id, "news");
+                    }
+                  }} // เรียกใช้ฟังก์ชันลบ
+                >
+                  Yes, I'm sure
+                </button>
+                <button
+                  type="button"
+                  className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  onClick={handleCloseModal} // ปิด modal
+                >
+                  No, cancel
+                </button>
               </div>
             </div>
-
-            {/* Pagination */}
-            <StyledPagination
-              className="flex justify-center pb-9"
-              count={totalPages} // จำนวนหน้าทั้งหมด
-              page={currentPage} // หน้าในปัจจุบัน
-              onChange={(_event, value) => setCurrentPage(value)} // เปลี่ยนหน้า
-            />
           </div>
-        )}
-      </>
-    );
-  } else {
-    return (
-      <>
-        {data.length === 0 ? (
-          <p>ไม่มีข้อมูลที่จะแสดง</p> // แสดงข้อความเมื่อไม่มีข้อมูล
-        ) : (
-          <div>
-            <div className="relative container mx-auto py-8 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
-              <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
-                {activity}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8">
-                {data.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-lg shadow-lg relative overflow-hidden"
+        </div>
+      )}
+      {isOpenEdit && (
+        <div
+          id="popup-modal"
+          tabIndex={-1}
+          className="fixed top-0 left-0 right-0 bottom-0 z-50 flex justify-center items-center"
+        >
+          <div className="relative p-4 w-full max-w-md max-h-full">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <button
+                type="button"
+                className="absolute top-1 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                onClick={handleCloseModalEdit}
+              >
+                <svg
+                  className="w-3 h-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M1 1l6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                  />
+                </svg>
+                <span className="sr-only">Close modal</span>
+              </button>
+              <div className="p-4 md:p-10 mt-5">
+                <div className="flex justify-center mb-8">
+                  <div className="bg-purple-200 w-80 h-60 flex items-center justify-center cursor-pointer relative">
+                    <img
+                      src={image!}
+                      alt="Selected"
+                      className="w-full h-full object-cover"
+                    />
+                    <label
+                      htmlFor="file"
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <label htmlFor="file">
+                        <SyncIcon style={{ fontSize: 40 }} />
+                      </label>
+                    </label>
+                    <input
+                      id="file"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: "none" }}
+                    />
+                  </div>
+                </div>
+
+                {/* หัวเรื่อง */}
+                <div className="mb-4 ">
+                  <label className="block text-left text-white text-sm font-bold mb-2">
+                    หัวเรื่อง
+                  </label>
+                  <input
+                    value={title} // ใช้ title state แทน
+                    onChange={(e) => setTitle(e.target.value)}
+                    type="text"
+                    placeholder="หัวเรื่อง"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                {/* วันที่/เดือน/ปี */}
+                <div className="mb-4">
+                  <label className="block text-left text-white text-sm font-bold mb-2">
+                    วันที่/เดือน/ปี
+                  </label>
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date: Date | null) => setSelectedDate(date)}
+                    showTimeSelect
+                    dateFormat="Pp"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholderText="เลือกวันที่และเวลา"
+                  />
+                </div>
+
+                {/* รายละเอียด */}
+                <div className="mb-4">
+                  <label className="block text-left text-white text-sm font-bold mb-2">
+                    รายละเอียด
+                  </label>
+                  <textarea
+                    value={body} // ใช้ title state แทน
+                    onChange={(e) => setBody(e.target.value)}
+                    placeholder="รายละเอียด"
+                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    rows={4}
+                  ></textarea>
+                </div>
+
+                <div className="flex justify-center mt-4">
+                  {" "}
+                  {/* เพิ่ม flex และ justify-center */}
+                  <button
+                    type="button"
+                    className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
+                    onClick={() => {
+                      handleSaveEdit();
+                    }}
                   >
-                    <img
-                      src={item.img}
-                      alt={`Activity Image ${item.id}`}
-                      className="w-full h-72 object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold mb-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {item.date_activity
-                          ? `วันที่ ${item.date_activity
-                              .toDate()
-                              .toLocaleDateString("th-TH")}`
-                          : "ไม่ระบุวันที่"}
-                      </p>
-                      <Link
-                        to={`/activity/${item.id}`}
-                        state={{ item }}
-                        className="text-red-600 hover:underline"
-                      >
-                        Read more
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                    onClick={handleCloseModalEdit}
+                  >
+                    No, cancel
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Pagination */}
-            <StyledPagination
-              className="flex justify-center pb-9"
-              count={totalPages} // จำนวนหน้าทั้งหมด
-              page={currentPage} // หน้าในปัจจุบัน
-              onChange={(_event, value) => setCurrentPage(value)} // เปลี่ยนหน้า
-            />
           </div>
-        )}
-      </>
-    );
-  }
+        </div>
+      )}
+    </>
+  );
+  // } else {
+  //   return (
+  //     <>
+  //       {data.length === 0 ? (
+  //         <p>ไม่มีข้อมูลที่จะแสดง</p> // แสดงข้อความเมื่อไม่มีข้อมูล
+  //       ) : (
+  //         <div>
+  //           <div className="relative container mx-auto py-8 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
+  //             <h2 className="relative inline-block bg-lime-200 px-4 py-2 rounded-tl-lg text-xl font-bold text-gray-600">
+  //               {activity}
+  //             </h2>
+  //             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8">
+  //               {data.map((item) => (
+  //                 <div
+  //                   key={item.id}
+  //                   className="bg-white rounded-lg shadow-lg relative overflow-hidden"
+  //                 >
+  //                   <img
+  //                     src={item.img}
+  //                     alt={`Activity Image ${item.id}`}
+  //                     className="w-full h-72 object-cover"
+  //                   />
+  //                   <div className="p-4">
+  //                     <h3 className="text-lg font-semibold mb-2">
+  //                       {item.title}
+  //                     </h3>
+  //                     <p className="text-sm text-gray-600 mb-4">
+  //                       {item.date_activity
+  //                         ? `วันที่ ${item.date_activity
+  //                             .toDate()
+  //                             .toLocaleDateString("th-TH")}`
+  //                         : "ไม่ระบุวันที่"}
+  //                     </p>
+  //                     <Link
+  //                       to={`/activity/${item.id}`}
+  //                       state={{ item }}
+  //                       className="text-red-600 hover:underline"
+  //                     >
+  //                       Read more
+  //                     </Link>
+  //                   </div>
+  //                 </div>
+  //               ))}
+  //             </div>
+  //           </div>
+
+  //           {/* Pagination */}
+  //           <StyledPagination
+  //             className="flex justify-center pb-9"
+  //             count={totalPages} // จำนวนหน้าทั้งหมด
+  //             page={currentPage} // หน้าในปัจจุบัน
+  //             onChange={(_event, value) => setCurrentPage(value)} // เปลี่ยนหน้า
+  //           />
+  //         </div>
+  //       )}
+  //     </>
+  //   );
+  // }
 };
 
 export default ActivityPage;

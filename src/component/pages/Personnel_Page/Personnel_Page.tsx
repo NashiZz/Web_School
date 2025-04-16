@@ -80,12 +80,12 @@ const PersonnelPage = () => {
       ) : (
         <div>
           <div
-            className="relative w-full h-[150px] md:h-[400px] lg:h-[500px] xl:h-[500px] bg-cover bg-center"
+            className="relative w-full h-[150px] md:h-[200px] lg:h-[300px] bg-cover bg-center"
             style={{ backgroundImage: `url(${backgroundImage})` }}
           >
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative flex items-center justify-center h-full">
-              <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold">
+              <h1 className="text-white text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
                 {departmentName}
               </h1>
             </div>
@@ -119,15 +119,14 @@ const PersonnelPage = () => {
           </div>
 
           <div
-            className="grid place-items-center grid-cols-[repeat(auto-fit,_16.666666%)] m-auto
-  justify-center gap-8  pt-10 pb-10"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(auto-fit,_16.666666%)] m-auto justify-center gap-8  pt-10 pb-10"
           >
             {state.personnel
               .filter((item) => item.isLeader !== true)
               .map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white justify-center rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden w-64 max-w-xs mx-auto"
+                  className="bg-white justify-center rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 relative overflow-hidden w-64 mx-auto"
                 >
                   <img
                     src={item.img}

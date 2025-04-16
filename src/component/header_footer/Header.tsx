@@ -99,7 +99,7 @@ function Header() {
       setUser(null);
       localStorage.setItem("isAdmin", "false");
       // alert("ออกจากระบบสำเร็จ");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }

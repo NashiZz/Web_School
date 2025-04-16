@@ -143,6 +143,16 @@ function Header() {
     };
   }, []);
 
+  const handleDepartmentClick = (deptName: string) => {
+    setDropdownOpen("");
+    navigate(`/personnel/${deptName}`);
+  };
+
+  const handleActivityClick = (activityType: string) => {
+    setDropdownOpen("");
+    navigate(`/show_activity/${activityType}`);
+  };
+
   return (
     <>
       {loading ? (
@@ -244,13 +254,13 @@ function Header() {
                       onMouseLeave={handleDropdownMouseLeave}
                     >
                       {department.current.map((dept, index) => (
-                        <Link
+                        <button
                           key={index}
-                          to={`/personnel/${dept.name}`}
-                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          className="block w-full text-start px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                          onClick={() => handleDepartmentClick(dept.name)}
                         >
                           {dept.name}
-                        </Link>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -268,17 +278,17 @@ function Header() {
                 </button>
                 {dropdownOpen === "activity" && (
                   <div
-                    className="absolute left-0 bg-white border border-gray-300 rounded-md shadow-lg w-96 z-20"
+                    className="absolute left-0 bg-white border border-gray-300 rounded-md shadow-lg w-36 z-20"
                     onMouseLeave={handleDropdownMouseLeave}
                   >
                     {ActivitiesoOrWorks.map((dept, index) => (
-                      <Link
+                      <button
                         key={index}
-                        to={`/show_activity/${dept}`}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                        className="block w-full text-start px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+                        onClick={() => handleActivityClick(dept)}
                       >
                         {dept}
-                      </Link>
+                      </button>
                     ))}
                   </div>
                 )}
